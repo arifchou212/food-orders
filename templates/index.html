@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Weekly Food</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>Weekly Food</h1>
+
+        <p>Fresh food available for pre-order</p>
+
+        <a href="{{ url_for('basket') }}">
+            🛒 View Basket
+        </a>
+
+    </header>
+
+
+    <main>
+
+        {% if event %}
+
+            <h2>{{ event.name }}</h2>
+
+            <p>
+                {{ event.event_date.strftime("%A %d %B %Y") }}
+            </p>
+
+        {% else %}
+
+            <h2>No food event currently available</h2>
+
+            <p>
+                Please check back later.
+            </p>
+
+        {% endif %}
+
+
+        <div class="menu">
+
+            {% for item in menu_items %}
+
+                <div class="menu-item">
+
+                    <h3>{{ item.name }}</h3>
+
+                    <p>
+                        {{ item.description }}
+                    </p>
+
+                    <strong>
+                        £{{ "%.2f"|format(item.price) }}
+                    </strong>
+
+
+                    {% if item.remaining_quantity == 0 %}
+
+                        <p>Sold Out</p>
+
+                        <button disabled>
+                            Sold Out
+                        </button>
+
+                    {% else %}
+
+                        <p>
+                            {{ item.remaining_quantity }} available
+                        </p>
+
+                        <a href="{{ url_for('basket_add', item_id=item.id) }}">
+                            <button>
+                                Add to basket
+                            </button>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% else %}
+
+                <p>
+                    The menu is not available yet.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

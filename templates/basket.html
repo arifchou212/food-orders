@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Your Basket</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>Your Basket</h1>
+
+        <a href="{{ url_for('home') }}">
+            Back to Menu
+        </a>
+
+    </header>
+
+
+    <main>
+
+        {% if basket_items %}
+
+            {% for entry in basket_items %}
+
+                <div class="menu-item">
+
+                    <h3>
+                        {{ entry.item.name }}
+                    </h3>
+
+                    <p>
+                        £{{ "%.2f"|format(entry.item.price) }} each
+                    </p>
+
+                    <div class="quantity-controls">
+
+                        <a href="{{ url_for(
+                            'basket_remove_one',
+                            item_id=entry.item.id
+                        ) }}">
+
+                            <button type="button">
+                                −
+                            </button>
+
+                        </a>
+
+
+                        <strong>
+                            {{ entry.quantity }}
+                        </strong>
+
+
+                        {% if entry.quantity < entry.item.remaining_quantity + entry.quantity %}
+
+                            <a href="{{ url_for(
+                                'basket_add',
+                                item_id=entry.item.id
+                            ) }}">
+
+                                <button type="button">
+                                    +
+                                </button>
+
+                            </a>
+
+                        {% else %}
+
+                            <button type="button" disabled>
+                                +
+                            </button>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <p>
+                        Subtotal:
+                        £{{ "%.2f"|format(entry.subtotal) }}
+                    </p>
+
+
+                    <form method="POST"
+                          action="{{ url_for(
+                              'basket_delete',
+                              item_id=entry.item.id
+                          ) }}">
+
+                        <button type="submit">
+                            Remove
+                        </button>
+
+                    </form>
+
+                </div>
+
+            {% endfor %}
+
+
+            <h2>
+                Total:
+                £{{ "%.2f"|format(total) }}
+            </h2>
+
+
+            <a href="{{ url_for('checkout') }}">
+
+                <button>
+                    Checkout
+                </button>
+
+            </a>
+
+
+        {% else %}
+
+            <h2>Your basket is empty</h2>
+
+            <a href="{{ url_for('home') }}">
+                View Menu
+            </a>
+
+        {% endif %}
+
+    </main>
+
+</body>
+
+</html>

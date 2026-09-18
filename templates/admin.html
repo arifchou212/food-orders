@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Food Orders Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>Food Orders Dashboard</h1>
+
+        {% if event %}
+
+            <h2>{{ event.name }}</h2>
+
+            <p>
+                {{ event.event_date.strftime("%A %d %B %Y") }}
+            </p>
+
+        {% else %}
+
+            <p>
+                No active food day.
+            </p>
+
+        {% endif %}
+
+
+        <p>
+
+            <a href="{{ url_for('home') }}">
+                Customer Site
+            </a>
+
+            |
+
+            <a href="{{ url_for('admin_menu') }}">
+                Manage Menu
+            </a>
+
+            |
+
+            <a href="{{ url_for('admin_logout') }}">
+                Logout
+            </a>
+
+        </p>
+
+    </header>
+
+
+    <main>
+
+        {% if event %}
+
+            <!-- Summary -->
+
+            <section class="menu-item">
+
+                <h2>Order Summary</h2>
+
+                <div>
+
+                    <strong>New</strong>
+
+                    <p>
+                        {{ new_orders }}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <strong>Preparing</strong>
+
+                    <p>
+                        {{ preparing_orders }}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <strong>Ready</strong>
+
+                    <p>
+                        {{ ready_orders }}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <strong>Collected</strong>
+
+                    <p>
+                        {{ collected_orders }}
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- Revenue -->
+
+            <section class="menu-item">
+
+                <h2>Expected Revenue</h2>
+
+                <h3>
+                    £{{ "%.2f"|format(total_revenue) }}
+                </h3>
+
+            </section>
+
+
+            <!-- Food To Prepare -->
+
+            <section class="menu-item">
+
+                <h2>Food To Prepare</h2>
+
+                {% if food_totals %}
+
+                    {% for food, quantity in food_totals.items() %}
+
+                        <div>
+
+                            <strong>
+                                {{ food }}
+                            </strong>
+
+                            <span>
+                                {{ quantity }}
+                            </span>
+
+                        </div>
+
+                        <hr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <p>
+                        No food has been ordered yet.
+                    </p>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- Orders -->
+
+            <section>
+
+                <h2>Orders</h2>
+
+
+                {% if orders %}
+
+                    {% for order in orders %}
+
+                        <div class="menu-item">
+
+                            <h3>
+
+                                <a href="{{ url_for(
+                                    'order_details',
+                                    order_id=order.id
+                                ) }}">
+
+                                    Order #{{ order.id }}
+
+                                </a>
+
+                            </h3>
+
+
+                            <p>
+                                <strong>Customer:</strong>
+                                {{ order.customer.name }}
+                            </p>
+
+
+                            <p>
+                                <strong>Phone:</strong>
+                                {{ order.customer.phone }}
+                            </p>
+
+
+                            <p>
+                                <strong>Total:</strong>
+                                £{{ "%.2f"|format(order.total) }}
+                            </p>
+
+
+                            <p>
+                                <strong>Fulfilment:</strong>
+                                {{ order.fulfilment_method }}
+                            </p>
+
+
+                            {% if order.fulfilment_method == "Collection" %}
+
+                                <p>
+                                    <strong>Collection:</strong>
+                                    {{ order.collection_slot }}
+                                </p>
+
+                            {% elif order.fulfilment_method == "Delivery" %}
+
+                                <p>
+                                    <strong>Delivery address:</strong>
+                                    {{ order.delivery_address }}
+                                </p>
+
+                            {% endif %}
+
+
+                            <p>
+                                <strong>Status:</strong>
+                                {{ order.status }}
+                            </p>
+
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'update_order_status',
+                                    order_id=order.id
+                                ) }}"
+                            >
+
+                                <label for="status-{{ order.id }}">
+                                    Update status
+                                </label>
+
+
+                                <select
+                                    id="status-{{ order.id }}"
+                                    name="status"
+                                >
+
+                                    <option value="New">
+                                        New
+                                    </option>
+
+                                    <option value="Preparing">
+                                        Preparing
+                                    </option>
+
+                                    <option value="Ready">
+                                        Ready
+                                    </option>
+
+                                    <option value="Collected">
+                                        Collected
+                                    </option>
+
+                                    <option value="Cancelled">
+                                        Cancelled
+                                    </option>
+
+                                </select>
+
+
+                                <button type="submit">
+                                    Update Status
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <p>
+                        No orders yet.
+                    </p>
+
+                {% endif %}
+
+            </section>
+
+        {% else %}
+
+            <section class="menu-item">
+
+                <h2>No Active Food Day</h2>
+
+                <p>
+                    Create a food day and activate it
+                    before accepting orders.
+                </p>
+
+                <a href="{{ url_for('admin_menu') }}">
+                    Manage Menu
+                </a>
+
+            </section>
+
+        {% endif %}
+
+    </main>
+
+</body>
+
+</html>

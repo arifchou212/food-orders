@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Menu</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>Manage Menu</h1>
+
+        <p>
+            Create food days and manage the menu.
+        </p>
+
+        <p>
+
+            <a href="{{ url_for('admin') }}">
+                Back to Dashboard
+            </a>
+
+            |
+
+            <a href="{{ url_for('admin_logout') }}">
+                Logout
+            </a>
+
+        </p>
+
+    </header>
+
+
+    <main>
+
+        <a href="{{ url_for('create_food_event') }}">
+
+            <button>
+                Create New Food Day
+            </button>
+
+        </a>
+
+
+        {% for event in events %}
+
+            <section class="menu-item">
+
+                <h2>
+                    {{ event.name }}
+                </h2>
+
+                <p>
+                    {{ event.event_date.strftime("%A %d %B %Y") }}
+                </p>
+
+
+                {% if event.active %}
+
+                    <p>
+                        <strong>Active</strong>
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        <strong>Inactive</strong>
+                    </p>
+
+                {% endif %}
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'toggle_food_event',
+                        event_id=event.id
+                    ) }}"
+                >
+
+                    <button type="submit">
+
+                        {% if event.active %}
+                            Deactivate
+                        {% else %}
+                            Activate
+                        {% endif %}
+
+                    </button>
+
+                </form>
+
+
+                <br>
+
+
+                <a href="{{ url_for(
+                    'add_menu_item',
+                    event_id=event.id
+                ) }}">
+
+                    <button>
+                        Add Food
+                    </button>
+
+                </a>
+
+
+                <h3>
+                    Food
+                </h3>
+
+
+                {% for item in event.menu_items %}
+
+                    {% if item.active %}
+
+                        <div class="menu-item">
+
+                            <h3>
+                                {{ item.name }}
+                            </h3>
+
+                            <p>
+                                {{ item.description }}
+                            </p>
+
+                            <p>
+                                <strong>
+                                    Price:
+                                </strong>
+
+                                £{{ "%.2f"|format(item.price) }}
+                            </p>
+
+                            <p>
+                                <strong>
+                                    Planned:
+                                </strong>
+
+                                {{ item.production_quantity }}
+                            </p>
+
+                            <p>
+                                <strong>
+                                    Remaining:
+                                </strong>
+
+                                {{ item.remaining_quantity }}
+                            </p>
+
+                            <p>
+                                <strong>
+                                    Ordered:
+                                </strong>
+
+                                {{ item.production_quantity - item.remaining_quantity }}
+                            </p>
+
+
+                            <a href="{{ url_for(
+                                'edit_menu_item',
+                                item_id=item.id
+                            ) }}">
+
+                                <button>
+                                    Edit
+                                </button>
+
+                            </a>
+
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'delete_menu_item',
+                                    item_id=item.id
+                                ) }}"
+                                style="display: inline;"
+                            >
+
+                                <button type="submit">
+                                    Remove
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <p>
+                        No food has been added yet.
+                    </p>
+
+                {% endfor %}
+
+            </section>
+
+        {% else %}
+
+            <p>
+                No food events have been created.
+            </p>
+
+        {% endfor %}
+
+    </main>
+
+</body>
+
+</html>

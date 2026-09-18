@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>Admin Login</h1>
+
+        <p>
+            Food Order Management
+        </p>
+
+    </header>
+
+
+    <main>
+
+        {% if error %}
+
+            <p>
+                {{ error }}
+            </p>
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            <label for="username">
+                Username
+            </label>
+
+            <input
+                type="text"
+                id="username"
+                name="username"
+                required
+                autocomplete="username"
+            >
+
+
+            <br>
+
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                autocomplete="current-password"
+            >
+
+
+            <br>
+
+
+            <button type="submit">
+                Login
+            </button>
+
+        </form>
+
+    </main>
+
+</body>
+
+</html>

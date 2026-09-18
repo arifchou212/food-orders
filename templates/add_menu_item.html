@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Food</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>Add Food</h1>
+
+        <p>
+            Add food to this week's menu.
+        </p>
+
+    </header>
+
+
+    <main>
+
+        <h2>
+            {{ event.name }}
+        </h2>
+
+        <p>
+            {{ event.event_date.strftime("%A %d %B %Y") }}
+        </p>
+
+
+        <form method="POST">
+
+            <label for="name">
+                Food name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                required
+            >
+
+
+            <br>
+
+
+            <label for="description">
+                Description
+            </label>
+
+            <textarea
+                id="description"
+                name="description"
+                placeholder="Describe the food..."
+            ></textarea>
+
+
+            <br>
+
+
+            <label for="price">
+                Price (£)
+            </label>
+
+            <input
+                type="number"
+                id="price"
+                name="price"
+                step="0.01"
+                min="0"
+                required
+            >
+
+
+            <br>
+
+
+            <label for="production_quantity">
+                Production quantity
+            </label>
+
+            <input
+                type="number"
+                id="production_quantity"
+                name="production_quantity"
+                min="0"
+                required
+            >
+
+
+            <br>
+
+
+            <button type="submit">
+                Add Food
+            </button>
+
+        </form>
+
+
+        <br>
+
+
+        <a href="{{ url_for('admin_menu') }}">
+            Back to Menu
+        </a>
+
+    </main>
+
+</body>
+
+</html>

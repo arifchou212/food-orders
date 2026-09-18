@@ -1,0 +1,1382 @@
+/* =========================================
+   Fonts
+   Bricolage Grotesque for headings and prices,
+   Instrument Sans for everything else.
+   Both fall back to system fonts if offline.
+   ========================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&display=swap");
+
+
+/* =========================================
+   Base
+   ========================================= */
+
+:root {
+    /* Palette */
+    --forest: #14513a;
+    --forest-deep: #0c3324;
+    --forest-soft: #e2f0e7;
+
+    --fresh: #4aa564;
+
+    --saffron: #f5b21a;
+    --saffron-deep: #c88a05;
+    --saffron-soft: #fdf1cf;
+
+    --chilli: #c93a24;
+    --chilli-soft: #fde8e3;
+
+    --leaf: #2f6b34;
+    --leaf-soft: #e4f1dc;
+
+    --paper: #f0f4ee;
+    --white: #ffffff;
+    --ink: #1d2b24;
+    --muted: #5f6f66;
+    --line: #dce6df;
+    --line-strong: #bccbc1;
+    --field: #82958a;
+
+    /* Type */
+    --font-display:
+        "Bricolage Grotesque",
+        "Trebuchet MS",
+        system-ui,
+        sans-serif;
+
+    --font-body:
+        "Instrument Sans",
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    /* Shape */
+    --radius: 20px;
+    --radius-sm: 12px;
+
+    --shadow:
+        0 1px 2px rgba(20, 81, 58, 0.06),
+        0 10px 28px rgba(20, 81, 58, 0.09);
+
+    --focus-ring: 0 0 0 4px rgba(245, 178, 26, 0.45);
+
+    /* Old variable names, mapped to the new palette so any
+       inline styles or other files that use them still work.
+       Delete this block once nothing references them. */
+    --cream: var(--paper);
+    --cream-dark: #e3eae4;
+    --green: var(--forest);
+    --green-dark: var(--forest-deep);
+    --green-light: var(--forest-soft);
+    --terracotta: var(--chilli);
+    --terracotta-dark: #a52d1a;
+    --terracotta-light: var(--chilli-soft);
+    --charcoal: var(--ink);
+    --border: var(--line);
+    --success: var(--leaf);
+    --danger: var(--chilli);
+}
+
+
+* {
+    box-sizing: border-box;
+}
+
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+
+body {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+
+    margin: 0;
+
+    background: var(--paper);
+
+    color: var(--ink);
+
+    line-height: 1.6;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+
+::selection {
+    background: var(--saffron);
+    color: var(--forest-deep);
+}
+
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+/* Keyboard focus. Text fields get their own ring further down. */
+
+:focus-visible {
+    outline: 3px solid var(--forest);
+    outline-offset: 3px;
+}
+
+
+/* =========================================
+   Typography
+   ========================================= */
+
+h1,
+h2,
+h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 700;
+
+    color: var(--forest);
+
+    line-height: 1.15;
+
+    letter-spacing: -0.02em;
+}
+
+
+h1 {
+    margin: 0 0 10px;
+
+    font-size: clamp(2.3rem, 6.5vw, 3.6rem);
+    font-weight: 800;
+
+    letter-spacing: -0.035em;
+}
+
+
+h2 {
+    margin-top: 0;
+
+    font-size: clamp(1.5rem, 3.4vw, 2rem);
+}
+
+
+h3 {
+    margin-top: 0;
+
+    font-size: 1.3rem;
+}
+
+
+p {
+    color: var(--ink);
+}
+
+
+main > p,
+section > p {
+    max-width: 68ch;
+}
+
+
+strong {
+    color: var(--forest);
+
+    font-weight: 700;
+}
+
+
+/* =========================================
+   Header
+
+   Solid forest green block with a striped awning
+   that rolls out once when the page loads.
+   ========================================= */
+
+header {
+    position: relative;
+    z-index: 1;
+
+    padding: 60px 20px 72px;
+
+    text-align: center;
+
+    color: var(--white);
+
+    background:
+        radial-gradient(
+            circle at 90% 50%,
+            transparent 0 120px,
+            rgba(255, 255, 255, 0.07) 120px 122px,
+            transparent 122px 168px,
+            rgba(255, 255, 255, 0.05) 168px 170px,
+            transparent 170px
+        ),
+        var(--forest);
+}
+
+
+header h1,
+header h2 {
+    color: var(--white);
+}
+
+
+header p {
+    max-width: 52ch;
+
+    color: rgba(255, 255, 255, 0.82);
+
+    margin: 8px auto;
+}
+
+
+header a {
+    display: inline-block;
+
+    margin: 8px 4px 0;
+    padding: 7px 16px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.12);
+
+    color: var(--white);
+
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+
+header a:hover {
+    background: var(--saffron);
+
+    color: var(--forest-deep);
+
+    text-decoration: none;
+}
+
+
+header :focus-visible {
+    outline-color: var(--saffron);
+}
+
+
+/* The awning. Each scallop is one 40px stripe. */
+
+header::after {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -27px;
+
+    height: 28px;
+
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(90deg, var(--saffron) 50%, var(--fresh) 50%);
+    background-size: 80px 100%;
+    background-position: 50% 0;
+    background-repeat: repeat-x;
+
+    -webkit-mask-image:
+        linear-gradient(#000, #000),
+        radial-gradient(circle at 20px 8px, #000 19px, transparent 20px);
+    -webkit-mask-size: 100% 8px, 40px 28px;
+    -webkit-mask-position: 0 0, calc(50% - 20px) 0;
+    -webkit-mask-repeat: no-repeat, repeat-x;
+
+    mask-image:
+        linear-gradient(#000, #000),
+        radial-gradient(circle at 20px 8px, #000 19px, transparent 20px);
+    mask-size: 100% 8px, 40px 28px;
+    mask-position: 0 0, calc(50% - 20px) 0;
+    mask-repeat: no-repeat, repeat-x;
+
+    transform-origin: top;
+
+    animation: awning-roll 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
+}
+
+
+@keyframes awning-roll {
+    from {
+        transform: scaleY(0);
+    }
+
+    to {
+        transform: scaleY(1);
+    }
+}
+
+
+/* =========================================
+   Main layout
+   ========================================= */
+
+main {
+    width: 100%;
+
+    max-width: 1040px;
+
+    margin: 64px auto 56px;
+
+    padding: 0 20px;
+}
+
+
+footer {
+    max-width: 1000px;
+
+    margin: 0 auto;
+    padding: 28px 20px 44px;
+
+    border-top: 2px dotted var(--line-strong);
+
+    text-align: center;
+
+    color: var(--muted);
+
+    font-size: 0.95rem;
+}
+
+
+footer p {
+    color: var(--muted);
+}
+
+
+/* =========================================
+   Links
+   ========================================= */
+
+a {
+    color: var(--forest);
+
+    font-weight: 600;
+
+    text-decoration-color: var(--saffron);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+
+a:hover {
+    color: var(--chilli);
+
+    text-decoration-color: currentColor;
+}
+
+
+/* =========================================
+   Buttons
+
+   Chunky and pressable. The default button is
+   saffron. Add class="secondary" for an outline
+   button or class="danger" for delete actions.
+   ========================================= */
+
+button {
+    font-family: var(--font-body);
+
+    background: var(--saffron);
+
+    color: var(--forest-deep);
+
+    padding: 12px 24px;
+
+    border: none;
+
+    border-radius: 999px;
+
+    cursor: pointer;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+    box-shadow: 0 3px 0 var(--saffron-deep);
+
+    transition:
+        background 0.15s ease,
+        box-shadow 0.1s ease,
+        transform 0.1s ease;
+}
+
+
+button:hover {
+    background: #ffc233;
+}
+
+
+button:active {
+    transform: translateY(3px);
+
+    box-shadow: 0 0 0 var(--saffron-deep);
+}
+
+
+button:disabled {
+    background: #dfe7e2;
+
+    color: #85948b;
+
+    box-shadow: none;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+button.secondary {
+    background: transparent;
+
+    color: var(--forest);
+
+    box-shadow: inset 0 0 0 2px var(--forest);
+}
+
+
+button.secondary:hover {
+    background: var(--forest-soft);
+}
+
+
+button.secondary:active {
+    transform: none;
+
+    box-shadow: inset 0 0 0 2px var(--forest);
+}
+
+
+button.danger {
+    background: var(--chilli);
+
+    color: var(--white);
+
+    box-shadow: 0 3px 0 #8f2513;
+}
+
+
+button.danger:hover {
+    background: #d94a33;
+}
+
+
+button.danger:active {
+    box-shadow: 0 0 0 #8f2513;
+}
+
+
+/* Button spacing.
+   Buttons next to each other get a gap. The first button in a
+   group gets room above it when it follows a field, text or
+   a price. Buttons that wrap or stack get a gap above them. */
+
+button:not(:last-child) {
+    margin-right: 8px;
+}
+
+
+button + button {
+    margin-top: 8px;
+}
+
+
+form > :not(button) + button,
+form input + button,
+form select + button,
+form textarea + button {
+    margin-top: 22px;
+}
+
+
+.menu-item > :not(button) + button,
+.dashboard-card > :not(button) + button {
+    margin-top: 16px;
+}
+
+
+/* Buttons inside table cells stay on one line, no extra gaps. */
+
+td button + button,
+th button + button {
+    margin-top: 0;
+}
+
+
+/* =========================================
+   Menu
+   ========================================= */
+
+.menu {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(270px, 1fr));
+
+    gap: 24px;
+
+    margin-top: 28px;
+}
+
+
+/* =========================================
+   Cards
+   ========================================= */
+
+.menu-item {
+    position: relative;
+
+    background: var(--white);
+
+    padding: 26px;
+
+    margin-bottom: 20px;
+
+    border: 1px solid var(--line);
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+.menu > .menu-item {
+    margin-bottom: 0;
+}
+
+
+/* Highlights the card you are currently editing. */
+
+.menu-item:focus-within {
+    border-color: var(--saffron);
+
+    box-shadow:
+        0 0 0 3px rgba(245, 178, 26, 0.4),
+        var(--shadow);
+}
+
+
+/* Cards with a stepper keep it pinned to the bottom,
+   so controls line up across a row of cards. */
+
+.menu-item:has(> .quantity-controls) {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.menu-item > .quantity-controls {
+    margin-top: auto;
+}
+
+
+.menu-item:has(> .quantity-controls) > strong {
+    margin-bottom: 18px;
+}
+
+
+.menu-item h3 {
+    margin-bottom: 8px;
+}
+
+
+.menu-item p {
+    margin: 8px 0;
+}
+
+
+.menu-item img {
+    display: block;
+
+    margin-bottom: 16px;
+
+    border-radius: 14px;
+}
+
+
+/* =========================================
+   Food price
+   ========================================= */
+
+.menu-item > strong {
+    display: block;
+    width: fit-content;
+    align-self: flex-start;
+
+    margin-top: 12px;
+    padding: 3px 14px;
+
+    border-radius: 999px;
+
+    background: var(--saffron-soft);
+
+    box-shadow: inset 0 0 0 1.5px rgba(245, 178, 26, 0.6);
+
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+
+    color: var(--forest);
+}
+
+
+/* =========================================
+   Forms
+   ========================================= */
+
+form {
+    max-width: 500px;
+}
+
+
+main > form,
+section > form {
+    padding: 28px;
+
+    background: var(--white);
+
+    border: 1px solid var(--line);
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+}
+
+
+label {
+    display: block;
+
+    margin-top: 18px;
+
+    margin-bottom: 6px;
+
+    color: var(--forest);
+
+    font-size: 0.95rem;
+
+    font-weight: 600;
+}
+
+
+form > label:first-child {
+    margin-top: 0;
+}
+
+
+input,
+textarea,
+select {
+    width: 100%;
+
+    max-width: 500px;
+
+    padding: 12px 14px;
+
+    margin: 0;
+
+    background: var(--white);
+
+    color: var(--ink);
+
+    border: 1.5px solid var(--field);
+
+    border-radius: var(--radius-sm);
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    outline: none;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+input::placeholder,
+textarea::placeholder {
+    color: #6f8178;
+}
+
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--forest);
+
+    box-shadow: var(--focus-ring);
+}
+
+
+textarea {
+    min-height: 120px;
+
+    resize: vertical;
+}
+
+
+select {
+    -webkit-appearance: none;
+    appearance: none;
+
+    padding-right: 44px;
+
+    cursor: pointer;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1.5l6 6 6-6' stroke='%2314513a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+}
+
+
+/* =========================================
+   Radio buttons and checkboxes
+   ========================================= */
+
+input[type="radio"],
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+
+    flex: none;
+
+    width: 22px;
+    height: 22px;
+
+    max-width: none;
+
+    padding: 0;
+
+    margin: 0 8px 0 0;
+
+    vertical-align: middle;
+
+    background: var(--white);
+
+    border: 2px solid var(--forest);
+
+    cursor: pointer;
+
+    transition:
+        background 0.12s ease,
+        box-shadow 0.12s ease;
+}
+
+
+input[type="radio"] {
+    border-radius: 50%;
+}
+
+
+input[type="checkbox"] {
+    border-radius: 6px;
+}
+
+
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+    box-shadow: none;
+}
+
+
+input[type="radio"]:checked {
+    background: var(--saffron);
+
+    box-shadow: inset 0 0 0 4px var(--white);
+}
+
+
+input[type="checkbox"]:checked {
+    background-color: var(--forest);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='10' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+input[type="radio"]:focus-visible,
+input[type="checkbox"]:focus-visible {
+    box-shadow: var(--focus-ring);
+}
+
+
+input[type="radio"]:checked:focus-visible {
+    box-shadow:
+        inset 0 0 0 4px var(--white),
+        var(--focus-ring);
+}
+
+
+input[type="radio"] + label,
+input[type="checkbox"] + label {
+    display: inline;
+
+    margin: 0;
+
+    color: var(--ink);
+
+    font-weight: 500;
+
+    vertical-align: middle;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   Quantity controls
+   ========================================= */
+
+.quantity-controls {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    width: fit-content;
+
+    margin: 18px 0 0;
+    padding: 5px;
+
+    background: var(--paper);
+
+    border-radius: 999px;
+}
+
+
+.quantity-controls button {
+    margin: 0;
+
+    width: 40px;
+
+    height: 40px;
+
+    padding: 0;
+
+    background: var(--forest);
+
+    color: var(--white);
+
+    font-size: 20px;
+
+    line-height: 1;
+
+    box-shadow: none;
+}
+
+
+.quantity-controls button:hover {
+    background: var(--saffron);
+
+    color: var(--forest-deep);
+}
+
+
+.quantity-controls button:active {
+    transform: scale(0.92);
+
+    box-shadow: none;
+}
+
+
+.quantity-controls button:disabled {
+    background: #d5dfd8;
+
+    color: #94a39a;
+}
+
+
+.quantity-controls strong {
+    min-width: 34px;
+
+    text-align: center;
+
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-variant-numeric: tabular-nums;
+
+    color: var(--ink);
+}
+
+
+/* =========================================
+   Sections
+   ========================================= */
+
+section {
+    margin-bottom: 40px;
+}
+
+
+section > h2 {
+    margin-bottom: 16px;
+}
+
+
+/* =========================================
+   Order / admin information
+   ========================================= */
+
+hr {
+    height: 0;
+
+    border: none;
+
+    border-top: 2px dotted var(--line-strong);
+
+    margin: 22px 0;
+}
+
+
+.menu-item span {
+    color: var(--muted);
+}
+
+
+/* =========================================
+   Status / messages
+   ========================================= */
+
+.error,
+.success {
+    position: relative;
+
+    margin-bottom: 20px;
+    padding: 14px 18px 14px 56px;
+
+    border-radius: var(--radius-sm);
+
+    font-weight: 500;
+}
+
+
+.error::before,
+.success::before {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+
+    display: grid;
+    place-items: center;
+
+    width: 26px;
+    height: 26px;
+
+    border-radius: 50%;
+
+    color: var(--white);
+
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+
+.error {
+    background: var(--chilli-soft);
+
+    color: #8f2513;
+
+    box-shadow: inset 0 0 0 1.5px rgba(201, 58, 36, 0.35);
+}
+
+
+.error::before {
+    content: "!";
+
+    background: var(--chilli);
+}
+
+
+.success {
+    background: var(--leaf-soft);
+
+    color: #1f4a24;
+
+    box-shadow: inset 0 0 0 1.5px rgba(47, 107, 52, 0.35);
+}
+
+
+.success::before {
+    content: "\2713";
+
+    background: var(--leaf);
+}
+
+
+/* =========================================
+   Tables / dashboard content
+   ========================================= */
+
+table {
+    width: 100%;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    background: var(--white);
+
+    border: 1px solid var(--line);
+
+    border-radius: var(--radius);
+
+    overflow: hidden;
+
+    box-shadow: var(--shadow);
+}
+
+
+th,
+td {
+    padding: 14px 16px;
+
+    border-bottom: 1px solid var(--line);
+
+    text-align: left;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+th {
+    background: var(--forest);
+
+    color: var(--white);
+
+    border-bottom: none;
+
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+tbody tr:hover td {
+    background: #f4f9f5;
+}
+
+
+.menu-item table,
+.dashboard-card table {
+    box-shadow: none;
+}
+
+
+/* =========================================
+   Admin dashboard
+   ========================================= */
+
+.dashboard-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(200px, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 32px;
+}
+
+
+.dashboard-card {
+    background: var(--white);
+
+    padding: 22px 24px;
+
+    border: 1px solid var(--line);
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+}
+
+
+.dashboard-card h3 {
+    margin-bottom: 4px;
+
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    letter-spacing: 0;
+
+    color: var(--muted);
+}
+
+
+.dashboard-card strong {
+    display: block;
+
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+
+    line-height: 1.1;
+
+    letter-spacing: -0.02em;
+
+    color: var(--forest);
+}
+
+
+/* The first card is treated as the headline number. */
+
+.dashboard-card:first-child {
+    background: var(--forest);
+
+    border-color: var(--forest);
+}
+
+
+.dashboard-card:first-child h3 {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+
+.dashboard-card:first-child strong {
+    color: var(--saffron);
+}
+
+
+/* =========================================
+   Admin food totals
+
+   Reads like a printed menu: item name, a dotted
+   leader, then the count.
+   ========================================= */
+
+.food-total {
+    display: flex;
+
+    align-items: center;
+
+    padding: 12px 0;
+}
+
+
+.food-total strong {
+    order: 1;
+
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+
+    color: var(--ink);
+}
+
+
+.food-total::before {
+    content: "";
+
+    order: 2;
+
+    flex: 1;
+
+    align-self: flex-end;
+
+    min-width: 24px;
+
+    margin: 0 12px 10px;
+
+    border-bottom: 2px dotted var(--line-strong);
+}
+
+
+.food-total span {
+    order: 3;
+
+    min-width: 46px;
+
+    padding: 2px 14px;
+
+    border-radius: 999px;
+
+    background: var(--saffron-soft);
+
+    text-align: center;
+
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.1rem;
+    font-variant-numeric: tabular-nums;
+
+    color: var(--forest);
+}
+
+
+/* =========================================
+   Small screens
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    body {
+        font-size: 1rem;
+    }
+
+
+    header {
+        padding: 44px 16px 60px;
+    }
+
+
+    main {
+        margin: 52px auto 40px;
+
+        padding: 0 16px;
+    }
+
+
+    .menu {
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+    }
+
+
+    .menu-item {
+        padding: 20px;
+    }
+
+
+    main > form,
+    section > form {
+        padding: 22px;
+    }
+
+
+    button {
+        width: 100%;
+
+        min-height: 48px;
+    }
+
+
+    button:not(:last-child) {
+        margin-right: 0;
+    }
+
+
+    button + button {
+        margin-top: 12px;
+    }
+
+
+    td button,
+    th button {
+        width: auto;
+
+        min-height: 40px;
+    }
+
+
+    td button + button,
+    th button + button {
+        margin-top: 0;
+    }
+
+
+    .quantity-controls {
+        margin-inline: auto;
+    }
+
+
+    .quantity-controls button {
+        width: 46px;
+        height: 46px;
+
+        min-height: 0;
+    }
+
+
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+
+    /* Lets wide admin tables scroll sideways inside
+       themselves instead of stretching the whole page. */
+
+    table {
+        display: block;
+
+        overflow-x: auto;
+
+        font-size: 14px;
+    }
+
+
+    th,
+    td {
+        padding: 12px 14px;
+
+        white-space: nowrap;
+    }
+
+
+    /* Stretches the last column so a short table still
+       fills the card instead of stopping early. */
+
+    th:last-child,
+    td:last-child {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 400px) {
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================================
+   Reduced motion
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    header::after {
+        animation: none;
+    }
+
+    button,
+    .menu-item,
+    input,
+    textarea,
+    select {
+        transition: none;
+    }
+
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Create Food Day</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>Create Food Day</h1>
+
+        <p>
+            Create a new day for selling food.
+        </p>
+
+    </header>
+
+
+    <main>
+
+        <form method="POST">
+
+            <label for="name">
+                Food day name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Saturday Food"
+                required
+            >
+
+
+            <br>
+
+
+            <label for="event_date">
+                Date
+            </label>
+
+            <input
+                type="date"
+                id="event_date"
+                name="event_date"
+                required
+            >
+
+
+            <br>
+
+
+            <button type="submit">
+                Create Food Day
+            </button>
+
+        </form>
+
+
+        <br>
+
+
+        <a href="{{ url_for('admin_menu') }}">
+            Back to Menu
+        </a>
+
+    </main>
+
+</body>
+
+</html>

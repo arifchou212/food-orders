@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Order Confirmed</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>Order Confirmed!</h1>
+
+        <p>
+            Thank you for your order.
+        </p>
+
+    </header>
+
+
+    <main>
+
+        <section class="menu-item">
+
+            <h2>Order #{{ order.id }}</h2>
+
+            <p>
+                Your order has been successfully placed.
+            </p>
+
+            <h3>
+                Total:
+                £{{ "%.2f"|format(order.total) }}
+            </h3>
+
+
+            <h3>
+                Fulfilment
+            </h3>
+
+            <p>
+                {{ order.fulfilment_method }}
+            </p>
+
+
+            {% if order.fulfilment_method == "Collection" %}
+
+                <p>
+                    <strong>Collection time:</strong>
+                    {{ order.collection_slot }}
+                </p>
+
+            {% elif order.fulfilment_method == "Delivery" %}
+
+                <p>
+                    <strong>Delivery address:</strong>
+                    {{ order.delivery_address }}
+                </p>
+
+            {% endif %}
+
+
+            <p>
+                Please keep your order number:
+                <strong>#{{ order.id }}</strong>
+            </p>
+
+        </section>
+
+
+        <a href="{{ url_for('home') }}">
+            <button>
+                Back to Menu
+            </button>
+        </a>
+
+    </main>
+
+</body>
+
+</html>

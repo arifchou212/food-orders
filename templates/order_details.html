@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Order #{{ order.id }}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>
+            Order #{{ order.id }}
+        </h1>
+
+        <p>
+            <a href="{{ url_for('admin') }}">
+                Back to Dashboard
+            </a>
+        </p>
+
+    </header>
+
+
+    <main>
+
+
+        <!-- Customer -->
+
+        <section class="menu-item">
+
+            <h2>
+                Customer
+            </h2>
+
+            <p>
+                <strong>Name:</strong>
+                {{ order.customer.name }}
+            </p>
+
+            <p>
+                <strong>Phone:</strong>
+                {{ order.customer.phone }}
+            </p>
+
+        </section>
+
+
+        <!-- Order -->
+
+        <section class="menu-item">
+
+            <h2>
+                Order
+            </h2>
+
+
+            {% for order_item in order_items %}
+
+                <div>
+
+                    <h3>
+                        {{ order_item.menu_item.name }}
+                    </h3>
+
+                    <p>
+                        <strong>
+                            Quantity:
+                        </strong>
+
+                        {{ order_item.quantity }}
+                    </p>
+
+                    <p>
+                        <strong>
+                            Price:
+                        </strong>
+
+                        £{{ "%.2f"|format(
+                            order_item.price_at_order
+                        ) }}
+                    </p>
+
+                    <p>
+                        <strong>
+                            Subtotal:
+                        </strong>
+
+                        £{{ "%.2f"|format(
+                            order_item.price_at_order
+                            * order_item.quantity
+                        ) }}
+                    </p>
+
+                </div>
+
+                <hr>
+
+            {% endfor %}
+
+
+            <h2>
+                Total:
+                £{{ "%.2f"|format(order.total) }}
+            </h2>
+
+        </section>
+
+
+        <!-- Fulfilment -->
+
+        <section class="menu-item">
+
+            <h2>
+                Fulfilment
+            </h2>
+
+
+            <p>
+                <strong>
+                    Method:
+                </strong>
+
+                {{ order.fulfilment_method }}
+            </p>
+
+
+            {% if order.fulfilment_method == "Collection" %}
+
+                <p>
+                    <strong>
+                        Collection slot:
+                    </strong>
+
+                    {{ order.collection_slot }}
+                </p>
+
+
+            {% elif order.fulfilment_method == "Delivery" %}
+
+                <p>
+                    <strong>
+                        Delivery address:
+                    </strong>
+
+                    {{ order.delivery_address }}
+                </p>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- Status -->
+
+        <section class="menu-item">
+
+            <h2>
+                Status
+            </h2>
+
+
+            <p>
+                Current status:
+
+                <strong>
+                    {{ order.status }}
+                </strong>
+            </p>
+
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'update_order_status',
+                    order_id=order.id
+                ) }}"
+            >
+
+                <label for="status">
+                    Update status
+                </label>
+
+
+                <select
+                    id="status"
+                    name="status"
+                >
+
+                    <option
+                        value="New"
+                        {% if order.status == "New" %}
+                            selected
+                        {% endif %}
+                    >
+                        New
+                    </option>
+
+
+                    <option
+                        value="Preparing"
+                        {% if order.status == "Preparing" %}
+                            selected
+                        {% endif %}
+                    >
+                        Preparing
+                    </option>
+
+
+                    <option
+                        value="Ready"
+                        {% if order.status == "Ready" %}
+                            selected
+                        {% endif %}
+                    >
+                        Ready
+                    </option>
+
+
+                    <option
+                        value="Collected"
+                        {% if order.status == "Collected" %}
+                            selected
+                        {% endif %}
+                    >
+                        Collected
+                    </option>
+
+
+                    <option
+                        value="Cancelled"
+                        {% if order.status == "Cancelled" %}
+                            selected
+                        {% endif %}
+                    >
+                        Cancelled
+                    </option>
+
+                </select>
+
+
+                <button type="submit">
+                    Update Status
+                </button>
+
+            </form>
+
+        </section>
+
+
+    </main>
+
+</body>
+
+</html>
