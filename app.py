@@ -12,6 +12,11 @@ from flask import (
     request
 )
 
+from werkzeug.security import (
+    generate_password_hash,
+    check_password_hash
+)
+
 from models import (
     db,
     FoodEvent,
@@ -493,9 +498,18 @@ def admin_login():
         )
 
 
+        stored_hash = os.getenv(
+            "ADMIN_PASSWORD_HASH"
+        )
+
+
         if (
             username == os.getenv("ADMIN_USERNAME")
-            and password == os.getenv("ADMIN_PASSWORD")
+            and stored_hash
+            and check_password_hash(
+                stored_hash,
+                password
+            )
         ):
 
             session["admin_logged_in"] = True
@@ -538,13 +552,15 @@ def admin_logout():
 @app.route("/admin")
 def admin():
 
-    if not session.get(
-        "admin_logged_in"
-    ):
+    if not session.get("admin_logged_in"):
         return redirect(
             url_for("admin_login")
         )
 
+
+    # ---------------------------------
+    # Current active event
+    # ---------------------------------
 
     event = FoodEvent.query.filter_by(
         active=True
@@ -553,12 +569,28 @@ def admin():
     ).first()
 
 
+    # ---------------------------------
+    # Previous events
+    # ---------------------------------
+
+    previous_events = FoodEvent.query.filter(
+        FoodEvent.active == False
+    ).order_by(
+        FoodEvent.event_date.desc()
+    ).all()
+
+
+    # ---------------------------------
+    # No active event
+    # ---------------------------------
+
     if not event:
 
         return render_template(
             "admin.html",
             event=None,
             orders=[],
+            previous_events=previous_events,
             food_totals={},
             total_revenue=0,
             new_orders=0,
@@ -567,6 +599,10 @@ def admin():
             collected_orders=0
         )
 
+
+    # ---------------------------------
+    # Current event orders
+    # ---------------------------------
 
     orders = Order.query.filter_by(
         event_id=event.id
@@ -586,21 +622,19 @@ def admin():
     collected_orders = 0
 
 
+    # ---------------------------------
+    # Process current event orders
+    # ---------------------------------
+
     for order in orders:
 
-        # ---------------------------------
         # Revenue
-        # ---------------------------------
-
         if order.status != "Cancelled":
 
             total_revenue += order.total
 
 
-        # ---------------------------------
         # Order status counts
-        # ---------------------------------
-
         if order.status == "New":
 
             new_orders += 1
@@ -618,10 +652,7 @@ def admin():
             collected_orders += 1
 
 
-        # ---------------------------------
         # Food preparation totals
-        # ---------------------------------
-
         if order.status != "Cancelled":
 
             order_items = OrderItem.query.filter_by(
@@ -652,6 +683,7 @@ def admin():
         "admin.html",
         event=event,
         orders=orders,
+        previous_events=previous_events,
         food_totals=food_totals,
         total_revenue=total_revenue,
         new_orders=new_orders,
@@ -659,7 +691,6 @@ def admin():
         ready_orders=ready_orders,
         collected_orders=collected_orders
     )
-
 
 # =========================================
 # Admin: Update Order Status
@@ -698,17 +729,137 @@ def update_order_status(order_id):
     ]
 
 
-    if new_status in allowed_statuses:
+    if new_status not in allowed_statuses:
 
-        order.status = new_status
+        return redirect(
+            url_for("admin")
+        )
 
-        db.session.commit()
+
+    old_status = order.status
+
+
+    # Nothing needs to change
+    if old_status == new_status:
+
+        return redirect(
+            url_for("admin")
+        )
+
+
+    # ---------------------------------
+    # Prevent cancelling an order
+    # that has already been collected
+    # ---------------------------------
+
+    if (
+        old_status == "Collected"
+        and new_status == "Cancelled"
+    ):
+
+        return redirect(
+            url_for("admin")
+        )
+
+
+    # ---------------------------------
+    # Get items in the order
+    # ---------------------------------
+
+    order_items = OrderItem.query.filter_by(
+        order_id=order.id
+    ).all()
+
+
+    # ---------------------------------
+    # Cancelling an order
+    # ---------------------------------
+
+    if (
+        new_status == "Cancelled"
+        and old_status != "Cancelled"
+    ):
+
+        for order_item in order_items:
+
+            item = db.session.get(
+                MenuItem,
+                order_item.menu_item_id
+            )
+
+
+            if item:
+
+                item.remaining_quantity += (
+                    order_item.quantity
+                )
+
+
+    # ---------------------------------
+    # Re-opening a cancelled order
+    # ---------------------------------
+
+    elif (
+        old_status == "Cancelled"
+        and new_status != "Cancelled"
+    ):
+
+        # First check that enough stock exists
+        # for the whole order.
+
+        for order_item in order_items:
+
+            item = db.session.get(
+                MenuItem,
+                order_item.menu_item_id
+            )
+
+
+            if not item:
+
+                return redirect(
+                    url_for("admin")
+                )
+
+
+            if (
+                item.remaining_quantity
+                < order_item.quantity
+            ):
+
+                return redirect(
+                    url_for("admin")
+                )
+
+
+        # Only change stock after we know
+        # the entire order can be fulfilled.
+
+        for order_item in order_items:
+
+            item = db.session.get(
+                MenuItem,
+                order_item.menu_item_id
+            )
+
+
+            item.remaining_quantity -= (
+                order_item.quantity
+            )
+
+
+    # ---------------------------------
+    # Update order status
+    # ---------------------------------
+
+    order.status = new_status
+
+    db.session.commit()
 
 
     return redirect(
         url_for("admin")
     )
-
 
 # =========================================
 # Admin: Order Details
@@ -741,6 +892,51 @@ def order_details(order_id):
         "order_details.html",
         order=order,
         order_items=order_items
+    )
+
+@app.route("/admin/event/<int:event_id>/orders")
+def event_orders(event_id):
+
+    if not session.get("admin_logged_in"):
+        return redirect(
+            url_for("admin_login")
+        )
+
+
+    # Find the event
+    event = db.session.get(
+        FoodEvent,
+        event_id
+    )
+
+
+    if not event:
+        return "Food event not found", 404
+
+
+    # Get all orders for this event
+    orders = Order.query.filter_by(
+        event_id=event.id
+    ).order_by(
+        Order.id.desc()
+    ).all()
+
+
+    # Calculate revenue
+    total_revenue = 0
+
+    for order in orders:
+
+        if order.status != "Cancelled":
+
+            total_revenue += order.total
+
+
+    return render_template(
+        "event_orders.html",
+        event=event,
+        orders=orders,
+        total_revenue=total_revenue
     )
 
 

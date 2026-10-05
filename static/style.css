@@ -1232,6 +1232,40 @@ tbody tr:hover td {
 }
 
 
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.status-new {
+    background-color: #e8f0f7;
+    color: #24506f;
+}
+
+.status-preparing {
+    background-color: #fff1d6;
+    color: #8a5a00;
+}
+
+.status-ready {
+    background-color: #e4f2e8;
+    color: #28633a;
+}
+
+.status-collected {
+    background-color: #eeeeee;
+    color: #555555;
+}
+
+.status-cancelled {
+    background-color: #f8dddd;
+    color: #a12626;
+}
+
 /* =========================================
    Small screens
    ========================================= */

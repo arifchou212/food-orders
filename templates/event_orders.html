@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ event.name }} | Order History
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>{{ event.name }}</h1>
+
+        <p>
+            {{ event.event_date.strftime("%A %d %B %Y") }}
+        </p>
+
+        <p>
+
+            <a href="{{ url_for('admin') }}">
+                Back to Dashboard
+            </a>
+
+            |
+
+            <a href="{{ url_for('admin_logout') }}">
+                Logout
+            </a>
+
+        </p>
+
+    </header>
+
+
+    <main>
+
+        <!-- Event Summary -->
+
+        <section class="menu-item">
+
+            <h2>Order History</h2>
+
+            <p>
+                Total Orders:
+                <strong>{{ orders|length }}</strong>
+            </p>
+
+            <p>
+                Revenue:
+                <strong>
+                    £{{ "%.2f"|format(total_revenue) }}
+                </strong>
+            </p>
+
+        </section>
+
+
+        <!-- Orders -->
+
+        <section>
+
+            {% if orders %}
+
+                {% for order in orders %}
+
+                    <div class="menu-item">
+
+                        <h3>
+
+                            <a href="{{ url_for(
+                                'order_details',
+                                order_id=order.id
+                            ) }}">
+
+                                Order #{{ order.id }}
+
+                            </a>
+
+                        </h3>
+
+
+                        <p>
+                            <strong>Customer:</strong>
+                            {{ order.customer.name }}
+                        </p>
+
+
+                        <p>
+                            <strong>Phone:</strong>
+                            {{ order.customer.phone }}
+                        </p>
+
+
+                        <p>
+                            <strong>Total:</strong>
+                            £{{ "%.2f"|format(order.total) }}
+                        </p>
+
+
+                        <p>
+                            <strong>Fulfilment:</strong>
+                            {{ order.fulfilment_method }}
+                        </p>
+
+
+                        {% if order.fulfilment_method == "Collection" %}
+
+                            <p>
+                                <strong>Collection:</strong>
+                                {{ order.collection_slot }}
+                            </p>
+
+                        {% elif order.fulfilment_method == "Delivery" %}
+
+                            <p>
+                                <strong>Delivery address:</strong>
+                                {{ order.delivery_address }}
+                            </p>
+
+                        {% endif %}
+
+
+                        <p>
+
+                            <strong>Status:</strong>
+
+                            <span class="status-badge status-{{ order.status|lower }}">
+
+                                {{ order.status }}
+
+                            </span>
+
+                        </p>
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="menu-item">
+
+                    <p>
+                        No orders were placed for this event.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
