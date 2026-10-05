@@ -17,6 +17,8 @@ from werkzeug.security import (
     check_password_hash
 )
 
+from flask_wtf.csrf import CSRFProtect
+
 from models import (
     db,
     FoodEvent,
@@ -35,6 +37,8 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///food_orders.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+csrf = CSRFProtect(app)
 
 db.init_app(app)
 
@@ -79,7 +83,10 @@ def home():
 # Customer: Basket
 # =========================================
 
-@app.route("/basket/add/<int:item_id>")
+@app.route(
+    "/basket/add/<int:item_id>",
+    methods=["POST"]
+)
 def basket_add(item_id):
 
     item = MenuItem.query.get_or_404(item_id)
@@ -114,7 +121,10 @@ def basket_add(item_id):
     return redirect(url_for("basket"))
 
 
-@app.route("/basket/remove-one/<int:item_id>")
+@app.route(
+    "/basket/remove-one/<int:item_id>",
+    methods=["POST"]
+)
 def basket_remove_one(item_id):
 
     basket = session.get("basket", {})

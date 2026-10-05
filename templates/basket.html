@@ -47,17 +47,23 @@
 
                     <div class="quantity-controls">
 
-                        <a href="{{ url_for(
-                            'basket_remove_one',
-                            item_id=entry.item.id
-                        ) }}">
+                        <form method="POST"
+                            action="{{ url_for(
+                                'basket_remove_one',
+                                item_id=entry.item.id
+                            ) }}">
 
-                            <button type="button">
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+
+                            <button type="submit">
                                 −
                             </button>
 
-                        </a>
-
+                        </form>
 
                         <strong>
                             {{ entry.quantity }}
@@ -66,16 +72,23 @@
 
                         {% if entry.quantity < entry.item.remaining_quantity + entry.quantity %}
 
-                            <a href="{{ url_for(
-                                'basket_add',
-                                item_id=entry.item.id
-                            ) }}">
+                            <form method="POST"
+                                action="{{ url_for(
+                                    'basket_add',
+                                    item_id=entry.item.id
+                                ) }}">
 
-                                <button type="button">
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
+
+                                <button type="submit">
                                     +
                                 </button>
 
-                            </a>
+                            </form>
 
                         {% else %}
 
@@ -99,6 +112,12 @@
                               'basket_delete',
                               item_id=entry.item.id
                           ) }}">
+
+                          <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
 
                         <button type="submit">
                             Remove
