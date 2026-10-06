@@ -49,8 +49,6 @@
                 placeholder="Saturday Food"
                 required
             >
-
-
             <br>
 
 
@@ -64,10 +62,56 @@
                 name="event_date"
                 required
             >
-
-
             <br>
 
+            <label for="collection_start_time">
+                Collection start time
+            </label>
+
+            <input
+                type="time"
+                id="collection_start_time"
+                name="collection_start_time"
+                required
+            >
+            <br>
+
+            <label for="collection_end_time">
+                Collection end time
+            </label>
+
+            <input
+                type="time"
+                id="collection_end_time"
+                name="collection_end_time"
+                required
+            >
+            <br>
+
+            <label for="collection_slot_duration">
+                Collection slot length (minutes)
+            </label>
+
+            <input
+                type="number"
+                id="collection_slot_duration"
+                name="collection_slot_duration"
+                min="1"
+                required
+            >
+            <br>
+
+            <label for="collection_slot_capacity">
+                Maximum orders per slot
+            </label>
+
+            <input
+                type="number"
+                id="collection_slot_capacity"
+                name="collection_slot_capacity"
+                min="1"
+                required
+            >
 
             <button type="submit">
                 Create Food Day

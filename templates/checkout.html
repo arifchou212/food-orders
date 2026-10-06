@@ -125,17 +125,6 @@
             </label>
 
 
-            <label>
-                <input
-                    type="radio"
-                    name="fulfilment_method"
-                    value="Delivery"
-                >
-
-                Delivery
-            </label>
-
-
             <div id="collection-section">
 
                 <h3>Collection Time</h3>
@@ -147,46 +136,36 @@
                 <select
                     id="collection_slot"
                     name="collection_slot"
+                    required
                 >
 
-                    <option value="12:00 - 12:30">
-                        12:00 - 12:30
+                    <option value="">
+                        Choose a collection slot
                     </option>
 
-                    <option value="12:30 - 13:00">
-                        12:30 - 13:00
-                    </option>
+                    {% for slot in collection_slots %}
 
-                    <option value="13:00 - 13:30">
-                        13:00 - 13:30
-                    </option>
+                        <option
+                            value="{{ slot.id }}"
+                            {% if slot.is_full %}disabled{% endif %}
+                        >
 
-                    <option value="13:30 - 14:00">
-                        13:30 - 14:00
-                    </option>
+                            {{ slot.start_time.strftime("%H:%M") }}
+                            -
+                            {{ slot.end_time.strftime("%H:%M") }}
+
+                            {% if slot.is_full %}
+                                (Full)
+                            {% endif %}
+
+                        </option>
+
+                    {% endfor %}
 
                 </select>
 
             </div>
-
-
-            <div id="delivery-section">
-
-                <h3>Delivery Address</h3>
-
-                <label for="delivery_address">
-                    Address
-                </label>
-
-                <textarea
-                    id="delivery_address"
-                    name="delivery_address"
-                    placeholder="Enter your delivery address"
-                ></textarea>
-
-            </div>
-
-
+            
             <br>
 
 

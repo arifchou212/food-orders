@@ -20,13 +20,32 @@ class FoodEvent(db.Model):
         db.Date,
         nullable=False
     )
+    
+    collection_start_time = db.Column(
+        db.Time,
+        nullable=False
+    )
+
+    collection_end_time = db.Column(
+        db.Time,
+        nullable=False
+    )
+
+    collection_slot_duration = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
+    collection_slot_capacity = db.Column(
+        db.Integer,
+        nullable=False
+    )
 
     active = db.Column(
         db.Boolean,
         default=False,
         nullable=False
     )
-
 
     menu_items = db.relationship(
         "MenuItem",

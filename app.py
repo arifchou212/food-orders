@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time, timedelta
 
 import os
 from dotenv import load_dotenv
@@ -25,7 +25,8 @@ from models import (
     MenuItem,
     Customer,
     Order,
-    OrderItem
+    OrderItem,
+    CollectionSlot
 )
 
 
@@ -220,7 +221,6 @@ def checkout():
 
     basket = session.get("basket", {})
 
-
     if not basket:
         return redirect(url_for("home"))
 
@@ -231,22 +231,29 @@ def checkout():
         FoodEvent.event_date.asc()
     ).first()
 
-
     if not event:
         return redirect(url_for("home"))
-
+    
+    collection_slots = event.collection_slots
+    
+    for slot in collection_slots:
+        slot.orders_count = Order.query.filter_by(
+            collection_slot_id=slot.id
+        ).filter(
+            Order.status != "Cancelled"
+        ).count()
+        
+        slot.is_full = slot.orders_count >= slot.capacity
 
     basket_items = []
 
     total = 0
-
 
     for item_id, quantity in basket.items():
 
         item = MenuItem.query.get(
             int(item_id)
         )
-
 
         if not item:
             return redirect(url_for("basket"))
@@ -256,7 +263,6 @@ def checkout():
         )
 
         total += subtotal
-
 
         basket_items.append({
             "item": item,
@@ -284,6 +290,7 @@ def checkout():
                     "checkout.html",
                     basket_items=basket_items,
                     total=total,
+                    collection_slots=collection_slots,
                     error=(
                         f"Invalid quantity for "
                         f"{item.name}."
@@ -299,6 +306,7 @@ def checkout():
                     "checkout.html",
                     basket_items=basket_items,
                     total=total,
+                    collection_slots=collection_slots,
                     error=(
                         f"{item.name} is no longer "
                         "available."
@@ -314,6 +322,7 @@ def checkout():
                     "checkout.html",
                     basket_items=basket_items,
                     total=total,
+                    collection_slots=collection_slots,
                     error=(
                         f"Not enough {item.name} "
                         "available."
@@ -342,6 +351,7 @@ def checkout():
                 "checkout.html",
                 basket_items=basket_items,
                 total=total,
+                collection_slots=collection_slots,
                 error=(
                     "Please enter your name "
                     "and phone number."
@@ -354,6 +364,7 @@ def checkout():
                 "checkout.html",
                 basket_items=basket_items,
                 total=total,
+                collection_slots=collection_slots,
                 error=(
                     "Please enter a valid "
                     "phone number."
@@ -366,6 +377,7 @@ def checkout():
                 "checkout.html",
                 basket_items=basket_items,
                 total=total,
+                collection_slots=collection_slots,
                 error=(
                     "Please enter a valid "
                     "name."
@@ -388,56 +400,84 @@ def checkout():
                 "checkout.html",
                 basket_items=basket_items,
                 total=total,
+                collection_slots=collection_slots,
                 error=(
                     "Please choose a fulfilment "
                     "method."
                 )
             )
 
-
-        collection_slot = request.form.get(
+        collection_slot_id = request.form.get(
             "collection_slot"
         )
 
-
-        if not collection_slot:
+        if not collection_slot_id:
 
             return render_template(
                 "checkout.html",
                 basket_items=basket_items,
                 total=total,
+                collection_slots=collection_slots,
                 error=(
                     "Please choose a "
                     "collection slot."
                 )
             )
+            
+        try:
+            collection_slot_id = int(collection_slot_id)
+            
+        except ValueError:
+            return render_template(
+                "checkout.html",
+                basket_items=basket_items,
+                total=total,
+                collection_slots=collection_slots,
+                error=(
+                    "Please choose a valid "
+                    "collection slot."
+                )
+            )
+            
+        collection_slot = CollectionSlot.query.filter_by(
+            id=collection_slot_id,
+            event_id=event.id
+        ).first()
 
+        if not collection_slot:
+            return render_template(
+                "checkout.html",
+                basket_items=basket_items,
+                total=total,
+                collection_slots=collection_slots,
+                error=(
+                    "Please choose a valid "
+                    "collection slot."
+                )
+            )
+            
+        order_count = Order.query.filter_by(
+            collection_slot_id=collection_slot.id
+        ).filter(
+            Order.status != "Cancelled"
+        ).count()
+
+
+        if order_count >= collection_slot.capacity:
+
+            return render_template(
+                "checkout.html",
+                basket_items=basket_items,
+                total=total,
+                collection_slots=collection_slots,
+                error=(
+                    "Sorry, that collection slot "
+                    "is now full. Please choose "
+                    "another slot."
+                )
+            )
 
         delivery_address = None
-
-
-        # else:
-
-        #     collection_slot = None
-
-        #     delivery_address = request.form.get(
-        #         "delivery_address",
-        #         ""
-        #     ).strip()
-
-
-        #     if not delivery_address:
-
-        #         return render_template(
-        #             "checkout.html",
-        #             basket_items=basket_items,
-        #             total=total,
-        #             error=(
-        #                 "Please enter your "
-        #                 "delivery address."
-        #             )
-        #         )
-
 
         # ---------------------------------
         # Create customer
@@ -463,7 +503,7 @@ def checkout():
             total=total,
             status="New",
             fulfilment_method=fulfilment_method,
-            collection_slot=collection_slot,
+            collection_slot_id=collection_slot.id,
             delivery_address=delivery_address
         )
 
@@ -514,7 +554,8 @@ def checkout():
     return render_template(
         "checkout.html",
         basket_items=basket_items,
-        total=total
+        total=total,
+        collection_slots=collection_slots
     )
 
 
@@ -983,6 +1024,83 @@ def event_orders(event_id):
     )
 
 
+@app.route(
+    "/admin/events/<int:event_id>/slots/add",
+    methods=["GET", "POST"]
+)
+def add_collection_slot(event_id):
+
+    event = FoodEvent.query.get_or_404(
+        event_id
+    )
+
+
+    if request.method == "POST":
+
+        start_time = request.form.get(
+            "start_time"
+        )
+
+        end_time = request.form.get(
+            "end_time"
+        )
+
+        capacity = request.form.get(
+            "capacity"
+        )
+        
+        if not start_time or not end_time or not capacity:
+
+            return render_template(
+                "add_collection_slot.html",
+                event=event,
+                error="Please fill in all fields."
+            )
+            
+        try:
+            capacity = int(capacity)
+
+        except ValueError:
+
+            return render_template(
+                "add_collection_slot.html",
+                event=event,
+                error="Capacity must be a whole number."
+            )
+            
+        if capacity < 1:
+            return render_template(
+                "add_collection_slot.html",
+                event=event,
+                error="Capacity must be at least 1."
+            )
+            
+        try:
+            start_time = datetime.strptime(
+                start_time,
+                "%H:%M"
+            ).time()
+
+            end_time = datetime.strptime(
+                end_time,
+                "%H:%M"
+            ).time()
+
+        except ValueError:
+
+            return render_template(
+                "add_collection_slot.html",
+                event=event,
+                error="Please enter valid times in HH:MM format."
+            )
+            
+        if start_time >= end_time:
+            return render_template(
+                "add_collection_slot.html",
+                event=event,
+                error="Start time must be before end time."
+            )
+
 # =========================================
 # Admin: Menu Management
 # =========================================
@@ -1381,7 +1499,149 @@ def create_food_event():
                     "Please enter a valid date."
                 )
             )
+            
+        collection_start_time = request.form.get(
+            "collection_start_time"
+        )
 
+        collection_end_time = request.form.get(
+            "collection_end_time"
+        )
+
+        collection_slot_duration = request.form.get(
+            "collection_slot_duration"
+        )
+
+        collection_slot_capacity = request.form.get(
+            "collection_slot_capacity"
+        )
+
+
+        if (
+            not collection_start_time
+            or not collection_end_time
+            or not collection_slot_duration
+            or not collection_slot_capacity
+        ):
+
+            return render_template(
+                "create_food_event.html",
+                error=(
+                    "Please complete all "
+                    "collection settings."
+                )
+            )
+            
+        try:
+            collection_start_time = datetime.strptime(
+                collection_start_time,
+                "%H:%M"
+            ).time()
+
+        except ValueError:
+
+            return render_template(
+                "create_food_event.html",
+                error=(
+                    "Please enter a valid "
+                    "collection start time."
+                )
+            )
+
+        try:
+            collection_end_time = datetime.strptime(
+                collection_end_time,
+                "%H:%M"
+            ).time()
+
+        except ValueError:
+
+            return render_template(
+                "create_food_event.html",
+                error=(
+                    "Please enter a valid "
+                    "collection end time."
+                )
+            )
+
+        try:
+            collection_slot_duration = int(collection_slot_duration)
+
+        except (ValueError, TypeError):
+
+            return render_template(
+                "create_food_event.html",
+                error=(
+                    "Please enter a valid "
+                    "collection slot duration."
+                )
+            )
+
+        try:
+            collection_slot_capacity = int(collection_slot_capacity)
+
+        except (ValueError, TypeError):
+
+            return render_template(
+                "create_food_event.html",
+                error=(
+                    "Please enter a valid "
+                    "collection slot capacity."
+                )
+            )
+            
+        if collection_start_time >= collection_end_time:
+
+            return render_template(
+                "create_food_event.html",
+                error=(
+                    "Collection start time "
+                    "must be before end time."
+                )
+            )
+        
+        if collection_slot_duration <= 0:
+
+            return render_template(
+                "create_food_event.html",
+                error=(
+                    "Collection slot duration "
+                    "must be a positive number."
+                )
+            )
+            
+        if collection_slot_capacity <= 0:
+
+            return render_template(
+                "create_food_event.html",
+                error=(
+                    "Collection slot capacity "
+                    "must be a positive number."
+                )
+            )
+            
+        total_minutes = (
+            datetime.combine(
+                event_date,
+                collection_end_time
+            )
+            - datetime.combine(
+                event_date,
+                collection_start_time
+            )
+        ).seconds // 60
+
+
+        if total_minutes % collection_slot_duration != 0:
+
+            return render_template(
+                "create_food_event.html",
+                error=(
+                    "Collection slot duration must "
+                    "divide exactly into the collection "
+                    "period."
+                )
+            )
 
         # New food days are inactive.
         # The admin can activate them separately.
@@ -1389,12 +1649,50 @@ def create_food_event():
         event = FoodEvent(
             name=name,
             event_date=event_date,
+            collection_start_time=collection_start_time,
+            collection_end_time=collection_end_time,
+            collection_slot_duration=collection_slot_duration,
+            collection_slot_capacity=collection_slot_capacity,
             active=False
         )
 
 
         db.session.add(event)
 
+        db.session.flush()
+        
+        current_start = collection_start_time
+
+
+        while current_start < collection_end_time:
+
+            current_start_datetime = datetime.combine(
+                event_date,
+                current_start
+            )
+
+            current_end_datetime = (
+                current_start_datetime
+                + timedelta(
+                    minutes=collection_slot_duration
+                )
+            )
+
+            current_end = current_end_datetime.time()
+
+
+            slot = CollectionSlot(
+                event_id=event.id,
+                start_time=current_start,
+                end_time=current_end,
+                capacity=collection_slot_capacity
+            )
+
+            db.session.add(slot)
+
+
+            current_start = current_end
+            
         db.session.commit()
 
 
