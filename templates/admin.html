@@ -269,6 +269,12 @@
                             ) }}"
                         >
 
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
                             <label for="status-{{ order.id }}">
                                 Update status
                             </label>

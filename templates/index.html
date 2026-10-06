@@ -83,11 +83,20 @@
                             {{ item.remaining_quantity }} available
                         </p>
 
-                        <a href="{{ url_for('basket_add', item_id=item.id) }}">
-                            <button>
+                        <form method="POST"
+                            action="{{ url_for('basket_add', item_id=item.id) }}">
+
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+
+                            <button type="submit">
                                 Add to basket
                             </button>
-                        </a>
+
+                        </form>
 
                     {% endif %}
 

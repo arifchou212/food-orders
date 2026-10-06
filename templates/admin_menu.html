@@ -90,6 +90,12 @@
                     ) }}"
                 >
 
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
                     <button type="submit">
 
                         {% if event.active %}
@@ -189,6 +195,12 @@
                                     item_id=item.id
                                 ) }}"
                                 style="display: inline;"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
                             >
 
                                 <button type="submit">

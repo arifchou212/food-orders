@@ -275,6 +275,19 @@ def checkout():
             item = entry["item"]
 
             quantity = entry["quantity"]
+            
+            # Quantity must be a positive whole number
+            
+            if not isinstance(quantity, int) or quantity <= 1:
+                return render_template(
+                    "checkout.html",
+                    basket_items=basket_items,
+                    total=total,
+                    error=(
+                        f"Invalid quantity for "
+                        f"{item.name}."
+                    )
+                )
 
 
             if (
