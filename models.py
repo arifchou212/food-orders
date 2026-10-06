@@ -33,6 +33,43 @@ class FoodEvent(db.Model):
         backref="event",
         cascade="all, delete-orphan"
     )
+    
+class CollectionSlot(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey("food_event.id"),
+        nullable=False
+    )
+
+    start_time = db.Column(
+        db.Time,
+        nullable=False
+    )
+
+    end_time = db.Column(
+        db.Time,
+        nullable=False
+    )
+
+    capacity = db.Column(
+        db.Integer,
+        nullable=False,
+        default=5
+    )
+
+    event = db.relationship(
+        "FoodEvent",
+        backref=db.backref(
+            "collection_slots",
+            cascade="all, delete-orphan"
+        )
+    )
 
 
 class MenuItem(db.Model):
@@ -133,8 +170,10 @@ class Order(db.Model):
         default="Collection"
     )
 
-    collection_slot = db.Column(
-        db.String(50)
+    collection_slot_id = db.Column(
+        db.Integer,
+        db.ForeignKey("collection_slot.id"),
+        nullable=False
     )
 
     delivery_address = db.Column(
@@ -148,6 +187,10 @@ class Order(db.Model):
 
     event = db.relationship(
         "FoodEvent"
+    )
+    
+    collection_slot = db.relationship(
+        "CollectionSlot"
     )
 
 

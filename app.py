@@ -248,20 +248,21 @@ def checkout():
         )
 
 
-        if item:
+        if not item:
+            return redirect(url_for("basket"))
 
-            subtotal = (
-                item.price * quantity
-            )
+        subtotal = (
+            item.price * quantity
+        )
 
-            total += subtotal
+        total += subtotal
 
 
-            basket_items.append({
-                "item": item,
-                "quantity": quantity,
-                "subtotal": subtotal
-            })
+        basket_items.append({
+            "item": item,
+            "quantity": quantity,
+            "subtotal": subtotal
+        })
 
 
     if request.method == "POST":
@@ -278,7 +279,7 @@ def checkout():
             
             # Quantity must be a positive whole number
             
-            if not isinstance(quantity, int) or quantity <= 1:
+            if not isinstance(quantity, int) or quantity < 1:
                 return render_template(
                     "checkout.html",
                     basket_items=basket_items,
@@ -346,6 +347,30 @@ def checkout():
                     "and phone number."
                 )
             )
+            
+        if len(phone) < 7 or len(phone) > 15:
+
+            return render_template(
+                "checkout.html",
+                basket_items=basket_items,
+                total=total,
+                error=(
+                    "Please enter a valid "
+                    "phone number."
+                )
+            )
+        
+        if len(name) < 2 or len(name) > 100:
+
+            return render_template(
+                "checkout.html",
+                basket_items=basket_items,
+                total=total,
+                error=(
+                    "Please enter a valid "
+                    "name."
+                )
+            )
 
 
         # ---------------------------------
@@ -357,10 +382,7 @@ def checkout():
         )
 
 
-        if fulfilment_method not in [
-            "Collection",
-            "Delivery"
-        ]:
+        if fulfilment_method != "Collection":
 
             return render_template(
                 "checkout.html",
@@ -373,50 +395,48 @@ def checkout():
             )
 
 
-        if fulfilment_method == "Collection":
+        collection_slot = request.form.get(
+            "collection_slot"
+        )
 
-            collection_slot = request.form.get(
-                "collection_slot"
+
+        if not collection_slot:
+
+            return render_template(
+                "checkout.html",
+                basket_items=basket_items,
+                total=total,
+                error=(
+                    "Please choose a "
+                    "collection slot."
+                )
             )
 
 
-            if not collection_slot:
-
-                return render_template(
-                    "checkout.html",
-                    basket_items=basket_items,
-                    total=total,
-                    error=(
-                        "Please choose a "
-                        "collection slot."
-                    )
-                )
+        delivery_address = None
 
 
-            delivery_address = None
+        # else:
+
+        #     collection_slot = None
+
+        #     delivery_address = request.form.get(
+        #         "delivery_address",
+        #         ""
+        #     ).strip()
 
 
-        else:
+        #     if not delivery_address:
 
-            collection_slot = None
-
-            delivery_address = request.form.get(
-                "delivery_address",
-                ""
-            ).strip()
-
-
-            if not delivery_address:
-
-                return render_template(
-                    "checkout.html",
-                    basket_items=basket_items,
-                    total=total,
-                    error=(
-                        "Please enter your "
-                        "delivery address."
-                    )
-                )
+        #         return render_template(
+        #             "checkout.html",
+        #             basket_items=basket_items,
+        #             total=total,
+        #             error=(
+        #                 "Please enter your "
+        #                 "delivery address."
+        #             )
+        #         )
 
 
         # ---------------------------------
