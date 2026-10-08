@@ -46,29 +46,15 @@
 
 
             <h3>
-                Fulfilment
+                Collection
             </h3>
 
             <p>
-                {{ order.fulfilment_method }}
+                <strong>Collection time:</strong>
+                {{ order.collection_slot.start_time.strftime("%H:%M") }}
+                -
+                {{ order.collection_slot.end_time.strftime("%H:%M") }}
             </p>
-
-
-            {% if order.fulfilment_method == "Collection" %}
-
-                <p>
-                    <strong>Collection time:</strong>
-                    {{ order.collection_slot }}
-                </p>
-
-            {% elif order.fulfilment_method == "Delivery" %}
-
-                <p>
-                    <strong>Delivery address:</strong>
-                    {{ order.delivery_address }}
-                </p>
-
-            {% endif %}
 
 
             <p>

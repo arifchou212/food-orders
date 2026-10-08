@@ -1,8 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
-
 db = SQLAlchemy()
-
 
 class FoodEvent(db.Model):
 
@@ -90,7 +88,6 @@ class CollectionSlot(db.Model):
         )
     )
 
-
 class MenuItem(db.Model):
 
     id = db.Column(
@@ -133,7 +130,11 @@ class MenuItem(db.Model):
         default=True,
         nullable=False
     )
-
+    
+    image_filename = db.Column(
+    db.String(255),
+    nullable=True
+    )
 
 class Customer(db.Model):
 
@@ -151,7 +152,6 @@ class Customer(db.Model):
         db.String(30),
         nullable=False
     )
-
 
 class Order(db.Model):
 
@@ -195,11 +195,6 @@ class Order(db.Model):
         nullable=False
     )
 
-    delivery_address = db.Column(
-        db.String(500)
-    )
-
-
     customer = db.relationship(
         "Customer"
     )
@@ -211,7 +206,6 @@ class Order(db.Model):
     collection_slot = db.relationship(
         "CollectionSlot"
     )
-
 
 class OrderItem(db.Model):
 

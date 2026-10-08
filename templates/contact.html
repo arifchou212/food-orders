@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<meta name="description"
+      content="Contact Euro Asia Homemade Foods with questions about our food, orders or collection.">
+
+<title>Contact | Euro Asia Homemade Foods</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>Contact Us</h1>
+
+    <p>
+        Have a question about our food, an order or collection?
+        Get in touch with us.
+    </p>
+
+    <a href="{{ url_for('home') }}">
+        Back to Menu
+    </a>
+
+</header>
+
+
+<main>
+
+    <section>
+
+        <h2>Get in touch</h2>
+
+        <p>
+            If you have a question about an order, collection,
+            our menu or allergens, please contact us.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>Contact details</h2>
+
+        <!-- Replace these placeholders with the real business details. -->
+
+        <p>
+            <strong>Phone:</strong>
+            <a href="tel:YOUR_PHONE_NUMBER">
+                YOUR PHONE NUMBER
+            </a>
+        </p>
+
+        <p>
+            <strong>Email:</strong>
+            <a href="mailto:YOUR_EMAIL_ADDRESS">
+                YOUR EMAIL ADDRESS
+            </a>
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>Collection</h2>
+
+        <p>
+            Orders are collection only from our specified
+            collection location in Loughborough.
+        </p>
+
+        <p>
+            Your selected collection date and time slot will be
+            shown when placing your order.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>Before contacting us about an order</h2>
+
+        <p>
+            If you have already placed an order, please have your
+            order number available so that we can help you more
+            quickly.
+        </p>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <nav aria-label="Footer navigation">
+
+        <a href="{{ url_for('privacy') }}">
+            Privacy Notice
+        </a>
+
+        <a href="{{ url_for('terms') }}">
+            Terms &amp; Conditions
+        </a>
+
+        <a href="{{ url_for('allergens') }}">
+            Allergen Information
+        </a>
+
+        <a href="{{ url_for('contact') }}">
+            Contact
+        </a>
+
+    </nav>
+
+    <p>
+        &copy; Euro Asia Homemade Foods
+    </p>
+
+</footer>
+
+</body>
+
+</html>

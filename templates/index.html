@@ -8,7 +8,16 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Weekly Food</title>
+    <meta name="description"
+          content="Order fresh homemade food from Euro Asia Homemade Foods in Loughborough. Pre-order online and collect during your selected time slot.">
+
+    <title>
+        {% if event %}
+            {{ event.name }} | Euro Asia Homemade Foods
+        {% else %}
+            Euro Asia Homemade Foods
+        {% endif %}
+    </title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
@@ -20,13 +29,23 @@
 
     <header>
 
-        <h1>Euro Asia Homemade Foods</h1>
+        <div class="header-content">
 
-        <p>Fresh food available for pre-order</p>
+            <h1>Euro Asia Homemade Foods</h1>
 
-        <a href="{{ url_for('basket') }}">
-            🛒 View Basket
-        </a>
+            <p>
+                Fresh homemade food, prepared weekly.
+            </p>
+
+            <p>
+                Pre-order online and collect from Loughborough.
+            </p>
+
+            <a href="{{ url_for('basket') }}">
+                🛒 View Basket
+            </a>
+
+        </div>
 
     </header>
 
@@ -35,84 +54,251 @@
 
         {% if event %}
 
-            <h2>{{ event.name }}</h2>
+            <section class="event-header">
 
-            <p>
-                {{ event.event_date.strftime("%A %d %B %Y") }}
-            </p>
+                <h2>{{ event.name }}</h2>
 
-        {% else %}
+                <p>
+                    {{ event.event_date.strftime("%A %d %B %Y") }}
+                </p>
 
-            <h2>No food event currently available</h2>
+                <p>
+                    <strong>Collection:</strong>
+                    {{ event.collection_start_time.strftime("%H:%M") }}
+                    –
+                    {{ event.collection_end_time.strftime("%H:%M") }}
+                </p>
 
-            <p>
-                Please check back later.
-            </p>
+                <p>
+                    Collection only · Loughborough
+                </p>
 
-        {% endif %}
-
-
-        <div class="menu">
-
-            {% for item in menu_items %}
-
-                <div class="menu-item">
-
-                    <h3>{{ item.name }}</h3>
-
-                    <p>
-                        {{ item.description }}
-                    </p>
-
-                    <strong>
-                        £{{ "%.2f"|format(item.price) }}
-                    </strong>
+            </section>
 
 
-                    {% if item.remaining_quantity == 0 %}
+            <section class="menu-section"
+                     aria-labelledby="menu-heading">
 
-                        <p>Sold Out</p>
+                <h2 id="menu-heading">
+                    This week's food
+                </h2>
 
-                        <button disabled>
-                            Sold Out
-                        </button>
+
+                <div class="menu">
+
+                    {% for item in menu_items %}
+
+                        <article class="menu-item">
+
+                            {% if item.image_filename %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename='images/menu/' ~ item.image_filename
+                                    ) }}"
+                                    alt="{{ item.name }}"
+                                    class="menu-item-image"
+                                    loading="lazy"
+                                >
+
+                            {% endif %}
+
+
+                            <div class="menu-item-content">
+
+                                <h3>
+                                    {{ item.name }}
+                                </h3>
+
+
+                                {% if item.description %}
+
+                                    <p>
+                                        {{ item.description }}
+                                    </p>
+
+                                {% endif %}
+
+
+                                <strong>
+                                    £{{ "%.2f"|format(item.price) }}
+                                </strong>
+
+
+                                {% if item.remaining_quantity == 0 %}
+
+                                    <p class="availability sold-out">
+                                        Sold out
+                                    </p>
+
+                                    <button type="button"
+                                            disabled
+                                            aria-disabled="true">
+                                        Sold out
+                                    </button>
+
+                                {% else %}
+
+                                    <p class="availability">
+
+                                        {% if item.remaining_quantity <= 5 %}
+
+                                            Only
+                                            {{ item.remaining_quantity }}
+                                            remaining
+
+                                        {% else %}
+
+                                            {{ item.remaining_quantity }}
+                                            available
+
+                                        {% endif %}
+
+                                    </p>
+
+
+                                    <form method="POST"
+                                          action="{{ url_for(
+                                              'basket_add',
+                                              item_id=item.id
+                                          ) }}">
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+
+                                        <button type="submit">
+                                            Add to basket
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+                            </div>
+
+                        </article>
+
 
                     {% else %}
 
                         <p>
-                            {{ item.remaining_quantity }} available
+                            There is no food available for this event yet.
+                            Please check back later.
                         </p>
 
-                        <form method="POST"
-                            action="{{ url_for('basket_add', item_id=item.id) }}">
-
-                            <input
-                                type="hidden"
-                                name="csrf_token"
-                                value="{{ csrf_token() }}"
-                            >
-
-                            <button type="submit">
-                                Add to basket
-                            </button>
-
-                        </form>
-
-                    {% endif %}
+                    {% endfor %}
 
                 </div>
 
-            {% else %}
+            </section>
+
+
+            <section class="collection-information">
+
+                <h2>
+                    How collection works
+                </h2>
+
+
+                <ol>
+
+                    <li>
+                        Choose your food and add it to your basket.
+                    </li>
+
+                    <li>
+                        Choose an available collection time at checkout.
+                    </li>
+
+                    <li>
+                        Place your order and keep your confirmation.
+                    </li>
+
+                    <li>
+                        Collect your order from Loughborough during your
+                        selected time slot.
+                    </li>
+
+                </ol>
+
 
                 <p>
-                    The menu is not available yet.
+                    <strong>Collection only.</strong>
+                    We do not currently offer delivery.
                 </p>
 
-            {% endfor %}
+            </section>
+
+
+        {% else %}
+
+            <section class="no-event">
+
+                <h2>
+                    No food event currently available
+                </h2>
+
+                <p>
+                    There is no food available to pre-order at the moment.
+                </p>
+
+                <p>
+                    Please check back soon for our next homemade food event.
+                </p>
+
+            </section>
+
+        {% endif %}
+
+    </main>
+
+
+    <footer>
+
+        <div class="footer-content">
+
+            <h2>
+                Euro Asia Homemade Foods
+            </h2>
+
+            <p>
+                Fresh homemade food, prepared weekly.
+            </p>
+
+
+            <nav aria-label="Footer navigation">
+
+                <a href="{{ url_for('privacy') }}">
+                    Privacy Notice
+                </a>
+
+                <a href="{{ url_for('terms') }}">
+                    Terms &amp; Conditions
+                </a>
+
+                <a href="{{ url_for('allergens') }}">
+                    Allergen Information
+                </a>
+
+                <a href="{{ url_for('contact') }}">
+                    Contact
+                </a>
+
+            </nav>
+
+
+            <p>
+                &copy; 2026 Euro Asia Homemade Foods
+            </p>
 
         </div>
 
-    </main>
+    </footer>
 
 </body>
 

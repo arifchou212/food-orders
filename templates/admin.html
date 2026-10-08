@@ -226,22 +226,12 @@
                             {{ order.fulfilment_method }}
                         </p>
 
-
-                        {% if order.fulfilment_method == "Collection" %}
-
-                            <p>
-                                <strong>Collection:</strong>
-                                {{ order.collection_slot }}
-                            </p>
-
-                        {% elif order.fulfilment_method == "Delivery" %}
-
-                            <p>
-                                <strong>Delivery address:</strong>
-                                {{ order.delivery_address }}
-                            </p>
-
-                        {% endif %}
+                        <p>
+                            <strong>Collection time:</strong>
+                            {{ order.collection_slot.start_time.strftime("%H:%M") }}
+                            -
+                            {{ order.collection_slot.end_time.strftime("%H:%M") }}
+                        </p>
 
 
                         <!-- Status -->

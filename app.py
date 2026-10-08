@@ -29,28 +29,25 @@ from models import (
     CollectionSlot
 )
 
-
 app = Flask(__name__)
 
 load_dotenv()
 
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///food_orders.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///food_orders.db"
+)
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 csrf = CSRFProtect(app)
 
 db.init_app(app)
 
-
 with app.app_context():
     db.create_all()
-
-
-# =========================================
-# Customer: Home
-# =========================================
 
 @app.route("/")
 def home():
@@ -79,11 +76,28 @@ def home():
         menu_items=menu_items
     )
 
+# Public information pages
 
-# =========================================
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+
+@app.route("/allergens")
+def allergens():
+    return render_template("allergens.html")
+
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
 # Customer: Basket
-# =========================================
-
 @app.route(
     "/basket/add/<int:item_id>",
     methods=["POST"]
@@ -121,7 +135,6 @@ def basket_add(item_id):
 
     return redirect(url_for("basket"))
 
-
 @app.route(
     "/basket/remove-one/<int:item_id>",
     methods=["POST"]
@@ -147,7 +160,6 @@ def basket_remove_one(item_id):
 
     return redirect(url_for("basket"))
 
-
 @app.route(
     "/basket/delete/<int:item_id>",
     methods=["POST"]
@@ -168,7 +180,6 @@ def basket_delete(item_id):
 
     return redirect(url_for("basket"))
 
-
 @app.route("/basket")
 def basket():
 
@@ -181,10 +192,7 @@ def basket():
 
     for item_id, quantity in basket.items():
 
-        item = MenuItem.query.get(
-            int(item_id)
-        )
-
+        item = db.session.get(MenuItem, int(item_id))
 
         if item:
 
@@ -208,11 +216,7 @@ def basket():
         total=total
     )
 
-
-# =========================================
 # Customer: Checkout
-# =========================================
-
 @app.route(
     "/checkout",
     methods=["GET", "POST"]
@@ -251,9 +255,7 @@ def checkout():
 
     for item_id, quantity in basket.items():
 
-        item = MenuItem.query.get(
-            int(item_id)
-        )
+        item = db.session.get(MenuItem, int(item_id))
 
         if not item:
             return redirect(url_for("basket"))
@@ -558,11 +560,7 @@ def checkout():
         collection_slots=collection_slots
     )
 
-
-# =========================================
 # Admin: Login
-# =========================================
-
 @app.route(
     "/admin/login",
     methods=["GET", "POST"]
@@ -615,7 +613,6 @@ def admin_login():
         "admin_login.html"
     )
 
-
 @app.route("/admin/logout")
 def admin_logout():
 
@@ -628,11 +625,7 @@ def admin_logout():
         url_for("admin_login")
     )
 
-
-# =========================================
 # Admin: Dashboard
-# =========================================
-
 @app.route("/admin")
 def admin():
 
@@ -776,10 +769,7 @@ def admin():
         collected_orders=collected_orders
     )
 
-# =========================================
 # Admin: Update Order Status
-# =========================================
-
 @app.route(
     "/admin/order/<int:order_id>/status",
     methods=["POST"]
@@ -945,10 +935,7 @@ def update_order_status(order_id):
         url_for("admin")
     )
 
-# =========================================
 # Admin: Order Details
-# =========================================
-
 @app.route(
     "/admin/order/<int:order_id>"
 )
@@ -1022,7 +1009,6 @@ def event_orders(event_id):
         orders=orders,
         total_revenue=total_revenue
     )
-
 
 @app.route(
     "/admin/events/<int:event_id>/slots/add",
@@ -1101,10 +1087,7 @@ def add_collection_slot(event_id):
                 error="Start time must be before end time."
             )
 
-# =========================================
 # Admin: Menu Management
-# =========================================
-
 @app.route("/admin/menu")
 def admin_menu():
 
@@ -1115,22 +1098,79 @@ def admin_menu():
             url_for("admin_login")
         )
 
-
     events = FoodEvent.query.order_by(
         FoodEvent.event_date.desc()
     ).all()
 
+    slot_data = {}
+
+    for event in events:
+
+        for slot in event.collection_slots:
+
+            order_count = Order.query.filter_by(
+                collection_slot_id=slot.id
+            ).filter(
+                Order.status != "Cancelled"
+            ).count()
+
+            slot_data[slot.id] = {
+                "order_count": order_count,
+                "is_full": order_count >= slot.capacity
+            }
 
     return render_template(
         "admin_menu.html",
-        events=events
+        events=events,
+        slot_data=slot_data
     )
 
+@app.route(
+    "/admin/collection-slot/<int:slot_id>/edit",
+    methods=["GET", "POST"]
+)
+def edit_collection_slot(slot_id):
 
-# =========================================
+    if not session.get("admin_logged_in"):
+        return redirect(url_for("admin_login"))
+
+    slot = db.session.get(CollectionSlot, slot_id)
+
+    if slot is None:
+        return "Collection slot not found", 404
+
+    if request.method == "POST":
+
+        capacity = request.form.get("capacity", "").strip()
+
+        try:
+            capacity = int(capacity)
+        except ValueError:
+            return render_template(
+                "edit_collection_slot.html",
+                slot=slot,
+                error="Please enter a valid capacity."
+            )
+
+        if capacity < 1:
+            return render_template(
+                "edit_collection_slot.html",
+                slot=slot,
+                error="Capacity must be at least 1."
+            )
+
+        slot.capacity = capacity
+
+        db.session.commit()
+
+        return redirect(url_for("admin_menu"))
+
+    return render_template(
+        "edit_collection_slot.html",
+        slot=slot
+    )
+    
 # Admin: Add Menu Item
-# =========================================
-
 @app.route(
     "/admin/menu/<int:event_id>/add",
     methods=["GET", "POST"]
@@ -1254,11 +1294,7 @@ def add_menu_item(event_id):
         event=event
     )
 
-
-# =========================================
 # Admin: Edit Menu Item
-# =========================================
-
 @app.route(
     "/admin/menu/item/<int:item_id>/edit",
     methods=["GET", "POST"]
@@ -1409,11 +1445,7 @@ def edit_menu_item(item_id):
         item=item
     )
 
-
-# =========================================
 # Admin: Remove Menu Item
-# =========================================
-
 @app.route(
     "/admin/menu/item/<int:item_id>/delete",
     methods=["POST"]
@@ -1443,11 +1475,7 @@ def delete_menu_item(item_id):
         url_for("admin_menu")
     )
 
-
-# =========================================
 # Admin: Create Food Day
-# =========================================
-
 @app.route(
     "/admin/menu/create",
     methods=["GET", "POST"]
@@ -1705,11 +1733,7 @@ def create_food_event():
         "create_food_event.html"
     )
 
-
-# =========================================
 # Admin: Activate / Deactivate Food Day
-# =========================================
-
 @app.route(
     "/admin/menu/event/<int:event_id>/toggle",
     methods=["POST"]
@@ -1755,10 +1779,6 @@ def toggle_food_event(event_id):
         url_for("admin_menu")
     )
 
-
-# =========================================
-# Run Application
-# =========================================
 
 if __name__ == "__main__":
 

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<meta name="description"
+      content="Terms and conditions for ordering from Euro Asia Homemade Foods.">
+
+<title>Terms &amp; Conditions | Euro Asia Homemade Foods</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>Terms &amp; Conditions</h1>
+
+    <p>
+        Please read these terms before placing an order.
+    </p>
+
+    <a href="{{ url_for('home') }}">
+        Back to Menu
+    </a>
+
+</header>
+
+
+<main>
+
+    <section>
+
+        <h2>1. About these terms</h2>
+
+        <p>
+            These terms and conditions apply to orders placed
+            through the Euro Asia Homemade Foods website.
+        </p>
+
+        <p>
+            By placing an order through the website, you agree
+            to these terms.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>2. Orders</h2>
+
+        <p>
+            Orders are placed online in advance for the available
+            food event shown on the website.
+        </p>
+
+        <p>
+            An order is not considered complete until the website
+            confirms that the order has been successfully placed.
+        </p>
+
+        <p>
+            Please check your order carefully before submitting it,
+            including the food items, quantities and collection slot.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>3. Food availability</h2>
+
+        <p>
+            Food is prepared in limited quantities. Items may become
+            unavailable when the available quantity has been reached.
+        </p>
+
+        <p>
+            We reserve the right to make reasonable changes to the
+            menu or availability where necessary.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>4. Collection</h2>
+
+        <p>
+            Orders are available for collection only. We do not
+            currently provide a delivery service through this website.
+        </p>
+
+        <p>
+            When placing an order, you must select an available
+            collection date and time slot.
+        </p>
+
+        <p>
+            Please arrive during your selected collection slot and
+            bring your order number where possible.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>5. Prices</h2>
+
+        <p>
+            Prices displayed on the website are shown in pounds
+            sterling (£).
+        </p>
+
+        <p>
+            We take reasonable care to ensure that prices displayed
+            on the website are accurate. If an obvious pricing error
+            occurs, we will contact you before fulfilling the order.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>6. Payment</h2>
+
+        <p>
+            Payment arrangements for an order will be shown during
+            the checkout process.
+        </p>
+
+        <p>
+            An order will only be treated as confirmed once the
+            website has successfully completed the required order
+            process.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>7. Cancellations and refunds</h2>
+
+        <p>
+            If you need to cancel an order or believe there is a
+            problem with an order, please contact us as soon as
+            possible using the details on our
+            <a href="{{ url_for('contact') }}">Contact</a>
+            page.
+        </p>
+
+        <p>
+            Any refund or cancellation will be handled according
+            to the circumstances of the order and applicable law.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>8. Allergies and dietary requirements</h2>
+
+        <p>
+            Please read our
+            <a href="{{ url_for('allergens') }}">
+                Allergen Information
+            </a>
+            before ordering.
+        </p>
+
+        <p>
+            If you have a food allergy or intolerance, contact us
+            before placing an order so that we can discuss whether
+            a dish is suitable for you.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>9. Changes to orders</h2>
+
+        <p>
+            Once an order has been submitted, changes may not always
+            be possible because food may be prepared specifically
+            for the order.
+        </p>
+
+        <p>
+            If you need to change an order, please contact us as
+            soon as possible.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>10. Website availability</h2>
+
+        <p>
+            We aim to keep the website available and accurate, but
+            we cannot guarantee that it will always be available or
+            free from errors.
+        </p>
+
+        <p>
+            We may temporarily suspend or modify the website when
+            maintenance or other circumstances require it.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>11. Contact</h2>
+
+        <p>
+            If you have any questions about these terms or an order,
+            please contact us through our
+            <a href="{{ url_for('contact') }}">Contact</a>
+            page.
+        </p>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <nav aria-label="Footer navigation">
+
+        <a href="{{ url_for('privacy') }}">
+            Privacy Notice
+        </a>
+
+        <a href="{{ url_for('terms') }}">
+            Terms &amp; Conditions
+        </a>
+
+        <a href="{{ url_for('allergens') }}">
+            Allergen Information
+        </a>
+
+        <a href="{{ url_for('contact') }}">
+            Contact
+        </a>
+
+    </nav>
+
+    <p>
+        &copy; Euro Asia Homemade Foods
+    </p>
+
+</footer>
+
+</body>
+
+</html>

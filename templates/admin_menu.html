@@ -53,7 +53,6 @@
 
         </a>
 
-
         {% for event in events %}
 
             <section class="menu-item">
@@ -109,9 +108,6 @@
                 </form>
 
 
-                <br>
-
-
                 <a href="{{ url_for(
                     'add_menu_item',
                     event_id=event.id
@@ -122,6 +118,62 @@
                     </button>
 
                 </a>
+
+                <h3>Collection slots</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Capacity</th>
+                            <th>Orders</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for slot in event.collection_slots %}
+                            <tr>
+                                <td>
+                                    {{ slot.start_time.strftime("%H:%M") }}
+                                    -
+                                    {{ slot.end_time.strftime("%H:%M") }}
+                                </td>
+
+                                <td>
+                                    {{ slot.capacity }}
+                                </td>
+
+                                <td>
+                                    {{ slot_data[slot.id]["order_count"] }}
+                                </td>
+
+                                <td>
+
+                                    {% if slot_data[slot.id]["is_full"] %}
+                                        Full
+                                    {% else %}
+                                        Available
+                                    {% endif %}
+
+                                </td>
+                                <td>
+                                    <a href="{{ url_for(
+                                        'edit_collection_slot',
+                                        slot_id=slot.id
+                                    ) }}">
+
+                                        <button type="button">
+                                            Edit
+                                        </button>
+
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
 
 
                 <h3>

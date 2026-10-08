@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<meta name="description"
+      content="Allergen information for Euro Asia Homemade Foods.">
+
+<title>Allergen Information | Euro Asia Homemade Foods</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>Allergen Information</h1>
+
+    <p>
+        Important information about allergens in our food.
+    </p>
+
+    <a href="{{ url_for('home') }}">
+        Back to Menu
+    </a>
+
+</header>
+
+
+<main>
+
+    <section>
+
+        <h2>Important information</h2>
+
+        <p>
+            If you have a food allergy or intolerance, please
+            contact us before placing an order.
+        </p>
+
+        <p>
+            We will provide information about the ingredients and
+            allergens present in the food we prepare.
+        </p>
+
+        <p>
+            Please do not place an order if you are unsure whether
+            a food is suitable for you. If you have a severe allergy,
+            discuss your requirements with us before ordering.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <h2>Allergens</h2>
+
+        <p>
+            The following are the 14 allergens that must be declared
+            when they are used as an ingredient in food:
+        </p>
+
+        <ul>
+
+            <li>Celery</li>
+            <li>Cereals containing gluten</li>
+            <li>Crustaceans</li>
+            <li>Eggs</li>
+            <li>Fish</li>
+            <li>Lupin</li>
+            <li>Milk</li>
+            <li>Molluscs</li>
+            <li>Mustard</li>
+            <li>Nuts</li>
+            <li>Peanuts</li>
+            <li>Sesame</li>
+            <li>Soya</li>
+            <li>Sulphur dioxide and sulphites</li>
+
+        </ul>
+
+    </section>
+
+
+    <section>
+
+        <h2>Our food</h2>
+
+        <p>
+            Allergen information for individual dishes should be
+            checked before ordering.
+        </p>
+
+        <!--
+            Add a food-specific allergen table here once the
+            ingredients for each dish have been confirmed.
+        -->
+
+    </section>
+
+
+    <section>
+
+        <h2>Cross-contact</h2>
+
+        <p>
+            Although we take care when preparing food, ingredients
+            containing allergens may be handled in the same
+            preparation environment.
+        </p>
+
+        <p>
+            Customers with allergies should contact us before
+            ordering so that we can discuss their requirements.
+        </p>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <nav aria-label="Footer navigation">
+
+        <a href="{{ url_for('privacy') }}">
+            Privacy Notice
+        </a>
+
+        <a href="{{ url_for('terms') }}">
+            Terms &amp; Conditions
+        </a>
+
+        <a href="{{ url_for('allergens') }}">
+            Allergen Information
+        </a>
+
+        <a href="{{ url_for('contact') }}">
+            Contact
+        </a>
+
+    </nav>
+
+    <p>
+        &copy; Euro Asia Homemade Foods
+    </p>
+
+</footer>
+
+</body>
+
+</html>
