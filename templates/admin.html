@@ -220,6 +220,16 @@
                             £{{ "%.2f"|format(order.total) }}
                         </p>
 
+                        <p>
+                            <strong>Payment:</strong>
+                            {{ order.payment_method }}
+                        </p>
+
+                        <p>
+                            <strong>Payment Status:</strong>
+                            {{ order.payment_status }}
+                        </p>
+
 
                         <p>
                             <strong>Fulfilment:</strong>

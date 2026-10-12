@@ -1,42 +1,46 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
-    <title>Checkout</title>
+<meta name="description"
+      content="Complete your Euro Asia Homemade Foods order and choose a collection time.">
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+<title>Checkout | Euro Asia Homemade Foods</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
 
 </head>
 
-
 <body>
 
-    <header>
+<header>
 
-        <h1>Checkout</h1>
+    <h1>Checkout</h1>
 
-        <a href="{{ url_for('basket') }}">
-            Back to Basket
-        </a>
+    <a href="{{ url_for('basket') }}">
+        Back to Basket
+    </a>
 
-    </header>
+</header>
 
 
-    <main>
+<main>
+
+    <section>
 
         <h2>Your Order</h2>
 
-
         {% for entry in basket_items %}
 
-            <div class="menu-item">
+            <article class="menu-item">
 
                 <h3>
                     {{ entry.item.name }}
@@ -55,7 +59,7 @@
                     £{{ "%.2f"|format(entry.subtotal) }}
                 </p>
 
-            </div>
+            </article>
 
         {% endfor %}
 
@@ -65,18 +69,21 @@
             £{{ "%.2f"|format(total) }}
         </h2>
 
+    </section>
 
-        {% if error %}
 
-            <p>
-                {{ error }}
-            </p>
+    {% if error %}
 
-        {% endif %}
+        <p role="alert">
+            {{ error }}
+        </p>
 
+    {% endif %}
+
+
+    <section>
 
         <h2>Your Details</h2>
-
 
         <form method="POST">
 
@@ -86,99 +93,158 @@
                 value="{{ csrf_token() }}"
             >
 
-            <label for="name">
-                Name
-            </label>
 
-            <input
-                type="text"
-                id="name"
-                name="name"
-                required
-            >
+            <div>
 
-
-            <label for="phone">
-                Phone number
-            </label>
-
-            <input
-                type="tel"
-                id="phone"
-                name="phone"
-                required
-            >
-
-
-            <h2>Fulfilment</h2>
-
-
-            <label>
-                <input
-                    type="radio"
-                    name="fulfilment_method"
-                    value="Collection"
-                    checked
-                >
-
-                Collection
-            </label>
-
-
-            <div id="collection-section">
-
-                <h3>Collection Time</h3>
-
-                <label for="collection_slot">
-                    Choose a collection slot
+                <label for="name">
+                    Name
                 </label>
 
-                <select
-                    id="collection_slot"
-                    name="collection_slot"
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ request.form.get('name', '') }}"
+                    maxlength="100"
+                    autocomplete="name"
                     required
                 >
 
-                    <option value="">
-                        Choose a collection slot
-                    </option>
+            </div>
 
-                    {% for slot in collection_slots %}
 
-                        <option
-                            value="{{ slot.id }}"
-                            {% if slot.is_full %}disabled{% endif %}
-                        >
+            <div>
 
-                            {{ slot.start_time.strftime("%H:%M") }}
-                            -
-                            {{ slot.end_time.strftime("%H:%M") }}
+                <label for="phone">
+                    Phone number
+                </label>
 
-                            {% if slot.is_full %}
-                                (Full)
-                            {% endif %}
-
-                        </option>
-
-                    {% endfor %}
-
-                </select>
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value="{{ request.form.get('phone', '') }}"
+                    maxlength="30"
+                    autocomplete="tel"
+                    required
+                >
 
             </div>
-            
-            <br>
 
 
-            <button type="submit">
-                Place Order
-            </button>
+            <section>
+
+                <h2 style="margin-top: 2rem;">Collection</h2>
+
+                <p>
+                    Orders are collection only.
+                </p>
+
+                <p>
+                    Please choose an available collection slot.
+                </p>
+
+
+                {% if collection_slots %}
+
+                    <label for="collection_slot">
+                        Collection time
+                    </label>
+
+                    <select
+                        id="collection_slot"
+                        name="collection_slot"
+                        required
+                    >
+
+                        <option value="">
+                            Choose a collection slot
+                        </option>
+
+                        {% for slot in collection_slots %}
+
+                            <option
+                                value="{{ slot.id }}"
+                                {% if slot.is_full %}disabled{% endif %}
+                                {% if request.form.get('collection_slot')|int == slot.id %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ slot.start_time.strftime("%H:%M") }}
+                                -
+                                {{ slot.end_time.strftime("%H:%M") }}
+
+                                {% if slot.is_full %}
+                                    (Full)
+                                {% else %}
+                                    ({{ slot.remaining_capacity }}
+                                    remaining)
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                {% else %}
+
+                    <p role="alert">
+                        There are currently no available collection
+                        slots for this food event.
+                    </p>
+
+                {% endif %}
+
+            </section>
+
+
+            {% if collection_slots %}
+
+                <button type="submit">
+                    Place Order
+                </button>
+
+            {% endif %}
 
         </form>
 
-    </main>
+    </section>
+
+</main>
 
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+<footer>
+
+    <nav aria-label="Footer navigation">
+
+        <a href="{{ url_for('privacy') }}">
+            Privacy Notice
+        </a>
+
+        <a href="{{ url_for('terms') }}">
+            Terms &amp; Conditions
+        </a>
+
+        <a href="{{ url_for('allergens') }}">
+            Allergen Information
+        </a>
+
+        <a href="{{ url_for('contact') }}">
+            Contact
+        </a>
+
+    </nav>
+
+    <p>
+        &copy; Euro Asia Homemade Foods
+    </p>
+
+</footer>
+
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 

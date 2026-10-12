@@ -31,6 +31,10 @@
 
     <main>
 
+        {% if error %}
+            <p class="error" role="alert">{{ error }}</p>
+        {% endif %}
+
         <form method="POST">
             <input
                 type="hidden"

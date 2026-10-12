@@ -77,25 +77,22 @@ def home():
     )
 
 # Public information pages
-
 @app.route("/privacy")
 def privacy():
     return render_template("privacy.html")
-
 
 @app.route("/terms")
 def terms():
     return render_template("terms.html")
 
-
 @app.route("/allergens")
 def allergens():
     return render_template("allergens.html")
 
-
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
+
 
 # Customer: Basket
 @app.route(
@@ -218,8 +215,8 @@ def basket():
 
 # Customer: Checkout
 @app.route(
-    "/checkout",
-    methods=["GET", "POST"]
+"/checkout",
+methods=["GET", "POST"]
 )
 def checkout():
 
@@ -237,34 +234,55 @@ def checkout():
 
     if not event:
         return redirect(url_for("home"))
-    
+
+
     collection_slots = event.collection_slots
-    
+
+
+    # Calculate current availability for each slot.
+
     for slot in collection_slots:
+
         slot.orders_count = Order.query.filter_by(
             collection_slot_id=slot.id
         ).filter(
             Order.status != "Cancelled"
         ).count()
-        
-        slot.is_full = slot.orders_count >= slot.capacity
+
+        slot.remaining_capacity = max(
+            slot.capacity - slot.orders_count,
+            0
+        )
+
+        slot.is_full = (
+            slot.remaining_capacity <= 0
+        )
+
 
     basket_items = []
 
     total = 0
 
+
     for item_id, quantity in basket.items():
 
-        item = db.session.get(MenuItem, int(item_id))
+        item = db.session.get(
+            MenuItem,
+            int(item_id)
+        )
 
         if not item:
-            return redirect(url_for("basket"))
+            return redirect(
+                url_for("basket")
+            )
+
 
         subtotal = (
             item.price * quantity
         )
 
         total += subtotal
+
 
         basket_items.append({
             "item": item,
@@ -274,20 +292,43 @@ def checkout():
 
 
     if request.method == "POST":
+        
+        # ---------------------------------
+        # Validate fulfilment method
+        # ---------------------------------
+
+        fulfilment_method = request.form.get(
+            "fulfilment_method",
+            ""
+        ).strip()
+
+        if fulfilment_method != "Collection":
+
+            return render_template(
+                "checkout.html",
+                basket_items=basket_items,
+                total=total,
+                collection_slots=collection_slots,
+                error="Please choose a fulfilment method."
+            )
 
         # ---------------------------------
         # Validate basket quantities
         # ---------------------------------
-
+        
+    
         for entry in basket_items:
 
             item = entry["item"]
 
             quantity = entry["quantity"]
-            
-            # Quantity must be a positive whole number
-            
-            if not isinstance(quantity, int) or quantity < 1:
+
+
+            if (
+                not isinstance(quantity, int)
+                or quantity < 1
+            ):
+
                 return render_template(
                     "checkout.html",
                     basket_items=basket_items,
@@ -304,6 +345,7 @@ def checkout():
                 not item.active
                 or item.event_id != event.id
             ):
+
                 return render_template(
                     "checkout.html",
                     basket_items=basket_items,
@@ -320,6 +362,7 @@ def checkout():
                 item.remaining_quantity is not None
                 and quantity > item.remaining_quantity
             ):
+
                 return render_template(
                     "checkout.html",
                     basket_items=basket_items,
@@ -359,20 +402,8 @@ def checkout():
                     "and phone number."
                 )
             )
-            
-        if len(phone) < 7 or len(phone) > 15:
 
-            return render_template(
-                "checkout.html",
-                basket_items=basket_items,
-                total=total,
-                collection_slots=collection_slots,
-                error=(
-                    "Please enter a valid "
-                    "phone number."
-                )
-            )
-        
+
         if len(name) < 2 or len(name) > 100:
 
             return render_template(
@@ -387,16 +418,7 @@ def checkout():
             )
 
 
-        # ---------------------------------
-        # Fulfilment
-        # ---------------------------------
-
-        fulfilment_method = request.form.get(
-            "fulfilment_method"
-        )
-
-
-        if fulfilment_method != "Collection":
+        if len(phone) < 7 or len(phone) > 30:
 
             return render_template(
                 "checkout.html",
@@ -404,14 +426,20 @@ def checkout():
                 total=total,
                 collection_slots=collection_slots,
                 error=(
-                    "Please choose a fulfilment "
-                    "method."
+                    "Please enter a valid "
+                    "phone number."
                 )
             )
+
+
+        # ---------------------------------
+        # Collection slot
+        # ---------------------------------
 
         collection_slot_id = request.form.get(
             "collection_slot"
         )
+
 
         if not collection_slot_id:
 
@@ -425,11 +453,15 @@ def checkout():
                     "collection slot."
                 )
             )
-            
+
         try:
-            collection_slot_id = int(collection_slot_id)
-            
-        except ValueError:
+
+            collection_slot_id = int(
+                collection_slot_id
+            )
+
+        except (TypeError, ValueError):
+
             return render_template(
                 "checkout.html",
                 basket_items=basket_items,
@@ -440,13 +472,16 @@ def checkout():
                     "collection slot."
                 )
             )
-            
+
+
         collection_slot = CollectionSlot.query.filter_by(
             id=collection_slot_id,
             event_id=event.id
         ).first()
 
+
         if not collection_slot:
+
             return render_template(
                 "checkout.html",
                 basket_items=basket_items,
@@ -457,7 +492,11 @@ def checkout():
                     "collection slot."
                 )
             )
-            
+
+
+        # Re-check slot capacity immediately
+        # before creating the order.
+
         order_count = Order.query.filter_by(
             collection_slot_id=collection_slot.id
         ).filter(
@@ -479,7 +518,6 @@ def checkout():
                 )
             )
 
-        delivery_address = None
 
         # ---------------------------------
         # Create customer
@@ -504,9 +542,10 @@ def checkout():
             customer_id=customer.id,
             total=total,
             status="New",
-            fulfilment_method=fulfilment_method,
-            collection_slot_id=collection_slot.id,
-            delivery_address=delivery_address
+            payment_method="Pending",
+            payment_status="Unpaid",
+            fulfilment_method="Collection",
+            collection_slot_id=collection_slot.id
         )
 
         db.session.add(order)
@@ -542,14 +581,20 @@ def checkout():
         db.session.commit()
 
 
-        # Empty basket after successful order
+        # Empty basket only after
+        # successful order creation.
 
         session["basket"] = {}
 
+        # Retrieve the items belonging to this order
+        order_items = OrderItem.query.filter_by(
+            order_id=order.id
+        ).all()
 
         return render_template(
             "order_confirmation.html",
-            order=order
+            order=order,
+            order_items=order_items
         )
 
 
@@ -963,6 +1008,58 @@ def order_details(order_id):
         "order_details.html",
         order=order,
         order_items=order_items
+    )
+
+
+# Admin: Update Order Payment
+@app.route(
+    "/admin/order/<int:order_id>/payment",
+    methods=["POST"]
+)
+def update_order_payment(order_id):
+
+    if not session.get("admin_logged_in"):
+        return redirect(url_for("admin_login"))
+
+    order = db.session.get(Order, order_id)
+
+    if order is None:
+        return redirect(url_for("admin"))
+
+    payment_method = request.form.get(
+        "payment_method", ""
+    ).strip()
+
+    payment_status = request.form.get(
+        "payment_status", ""
+    ).strip()
+
+    allowed_payment_methods = [
+        "Pending",
+        "Bank Transfer",
+        "Cash"
+    ]
+
+    allowed_payment_statuses = [
+        "Unpaid",
+        "Paid"
+    ]
+
+    if (
+        payment_method not in allowed_payment_methods
+        or payment_status not in allowed_payment_statuses
+    ):
+        return redirect(
+            url_for("order_details", order_id=order.id)
+        )
+
+    order.payment_method = payment_method
+    order.payment_status = payment_status
+
+    db.session.commit()
+
+    return redirect(
+        url_for("order_details", order_id=order.id)
     )
 
 @app.route("/admin/event/<int:event_id>/orders")

@@ -182,6 +182,18 @@ class Order(db.Model):
         nullable=False,
         default="New"
     )
+    
+    payment_method = db.Column(
+    db.String(20),
+    nullable=False,
+    default="Pending"
+    )
+
+    payment_status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="Unpaid"
+    )
 
     fulfilment_method = db.Column(
         db.String(20),

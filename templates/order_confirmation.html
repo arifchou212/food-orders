@@ -8,6 +8,9 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
+    <meta name="description"
+          content="Your Euro Asia Homemade Foods order confirmation.">
+
     <title>Order Confirmed</title>
 
     <link rel="stylesheet"
@@ -33,11 +36,40 @@
 
         <section class="menu-item">
 
-            <h2>Order #{{ order.id }}</h2>
+            <h2>
+                Order #{{ order.id }}
+            </h2>
 
             <p>
                 Your order has been successfully placed.
             </p>
+
+
+            <!-- Order details -->
+
+            <h3 style="margin-top: 30px;">
+                Your Order
+            </h3>
+
+            {% for item in order_items %}
+
+            <div>
+
+                <p>
+                    <strong>{{ item.menu_item.name }}</strong>
+                    × {{ item.quantity }}
+                </p>
+
+                <p>
+                    £{{ "%.2f"|format(
+                        item.price_at_order * item.quantity
+                    ) }}
+                </p>
+
+            </div>
+
+            {% endfor %}
+
 
             <h3>
                 Total:
@@ -45,9 +77,16 @@
             </h3>
 
 
-            <h3>
+            <!-- Collection -->
+
+            <h3 style="margin-top: 30px;">
                 Collection
             </h3>
+
+            <p>
+                <strong>Date:</strong>
+                {{ order.event.event_date.strftime("%A %d %B %Y") }}
+            </p>
 
             <p>
                 <strong>Collection time:</strong>
@@ -56,22 +95,111 @@
                 {{ order.collection_slot.end_time.strftime("%H:%M") }}
             </p>
 
+            <p>
+                This is a collection-only order.
+            </p>
 
             <p>
-                Please keep your order number:
+                <strong>
+                    The collection address will be provided to you
+                    directly after your order has been confirmed.
+                </strong>
+            </p>
+
+
+            <!-- Payment -->
+
+            <h3 style="margin-top: 30px;">
+                Payment
+            </h3>
+
+            <p>
+                Payment has not been taken through the website.
+            </p>
+
+            <p>
+                We will contact you using the phone number you
+                provided to confirm your order and ask whether
+                you would like to pay by bank transfer or cash
+                when you collect your order.
+            </p>
+
+            <p>
+                If you choose bank transfer, we will provide the
+                payment details to you directly.
+            </p>
+
+
+            <!-- Customer details -->
+
+            <h3 style="margin-top: 30px;">
+                Your Details
+            </h3>
+
+            <p>
+                <strong>Name:</strong>
+                {{ order.customer.name }}
+            </p>
+
+            <p>
+                <strong>Phone:</strong>
+                {{ order.customer.phone }}
+            </p>
+
+
+            <!-- Important reminder -->
+
+            <h3 style="margin-top: 30px;">
+                Please Keep Your Order Number
+            </h3>
+
+            <p>
+                Your order number is:
                 <strong>#{{ order.id }}</strong>
+            </p>
+
+            <p>
+                Please mention this number when contacting us
+                about your order.
             </p>
 
         </section>
 
 
-        <a href="{{ url_for('home') }}">
-            <button>
-                Back to Menu
-            </button>
-        </a>
+        <div style="margin-top: 20px;">
+
+            <a href="{{ url_for('home') }}">
+                <button type="button">
+                    Back to Menu
+                </button>
+            </a>
+
+        </div>
 
     </main>
+
+
+    <footer>
+
+        <p>
+            <a href="{{ url_for('privacy') }}">
+                Privacy Notice
+            </a>
+            |
+            <a href="{{ url_for('terms') }}">
+                Terms & Conditions
+            </a>
+            |
+            <a href="{{ url_for('allergens') }}">
+                Allergen Information
+            </a>
+            |
+            <a href="{{ url_for('contact') }}">
+                Contact
+            </a>
+        </p>
+
+    </footer>
 
 </body>
 
