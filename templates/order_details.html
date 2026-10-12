@@ -117,50 +117,99 @@
 
         </section>
 
-
         <!-- Fulfilment -->
 
         <section class="menu-item">
 
-            <h2>
-                Fulfilment
-            </h2>
-
+            <h2>Fulfilment</h2>
 
             <p>
-                <strong>
-                    Method:
-                </strong>
-
+                <strong>Method:</strong>
                 {{ order.fulfilment_method }}
             </p>
 
-
-            {% if order.fulfilment_method == "Collection" %}
+            {% if order.fulfilment_method == "Collection" and order.collection_slot %}
 
                 <p>
-                    <strong>
-                        Collection slot:
-                    </strong>
-
-                    {{ order.collection_slot }}
+                    <strong>Collection date:</strong>
+                    {{ order.event.event_date.strftime("%A %d %B %Y") }}
                 </p>
 
-
-            {% elif order.fulfilment_method == "Delivery" %}
-
                 <p>
-                    <strong>
-                        Delivery address:
-                    </strong>
-
-                    {{ order.delivery_address }}
+                    <strong>Collection time:</strong>
+                    {{ order.collection_slot.start_time.strftime("%H:%M") }}
+                    -
+                    {{ order.collection_slot.end_time.strftime("%H:%M") }}
                 </p>
 
             {% endif %}
 
         </section>
 
+        <section class="menu-item">
+        <h2>Update Payment</h2>
+
+        <form
+            method="POST"
+            action="{{ url_for('update_order_payment', order_id=order.id) }}"
+        >
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <label for="payment_method">
+                Payment method
+            </label>
+
+            <select id="payment_method" name="payment_method" required>
+                <option
+                    value="Pending"
+                    {% if order.payment_method == "Pending" %}selected{% endif %}
+                >
+                    Pending
+                </option>
+
+                <option
+                    value="Bank Transfer"
+                    {% if order.payment_method == "Bank Transfer" %}selected{% endif %}
+                >
+                    Bank Transfer
+                </option>
+
+                <option
+                    value="Cash"
+                    {% if order.payment_method == "Cash" %}selected{% endif %}
+                >
+                    Cash
+                </option>
+            </select>
+
+            <label for="payment_status">
+                Payment status
+            </label>
+
+            <select id="payment_status" name="payment_status" required>
+                <option
+                    value="Unpaid"
+                    {% if order.payment_status == "Unpaid" %}selected{% endif %}
+                >
+                    Unpaid
+                </option>
+
+                <option
+                    value="Paid"
+                    {% if order.payment_status == "Paid" %}selected{% endif %}
+                >
+                    Paid
+                </option>
+            </select>
+
+            <button type="submit">Save Payment Details</button>
+        </form>
+
+        </section>
 
         <!-- Status -->
 

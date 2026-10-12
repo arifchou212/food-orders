@@ -2,205 +2,162 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <meta name="description"
-          content="Your Euro Asia Homemade Foods order confirmation.">
-
-    <title>Order Confirmed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Order details and collection information for Euro Asia Homemade Foods.">
+    <title>Order Received | Euro Asia Homemade Foods</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-
 </head>
 
+<body class="confirmation-page">
 
-<body>
-
-    <header>
-
-        <h1>Order Confirmed!</h1>
-
-        <p>
-            Thank you for your order.
-        </p>
-
+    <header class="confirmation-header">
+        <p class="confirmation-eyebrow">EURO ASIA HOMEMADE FOODS</p>
+        <h1>Order received</h1>
+        <p>Thank you for ordering with us.</p>
     </header>
 
+    <main class="confirmation-main">
 
-    <main>
+        <section class="confirmation-card">
 
-        <section class="menu-item">
-
-            <h2>
-                Order #{{ order.id }}
-            </h2>
-
-            <p>
-                Your order has been successfully placed.
-            </p>
-
-
-            <!-- Order details -->
-
-            <h3 style="margin-top: 30px;">
-                Your Order
-            </h3>
-
-            {% for item in order_items %}
-
-            <div>
-
-                <p>
-                    <strong>{{ item.menu_item.name }}</strong>
-                    × {{ item.quantity }}
-                </p>
-
-                <p>
-                    £{{ "%.2f"|format(
-                        item.price_at_order * item.quantity
-                    ) }}
-                </p>
-
+            <div class="confirmation-success">
+                <span class="confirmation-check" aria-hidden="true">&#10003;</span>
+                <div>
+                    <h2>Thank you for your order</h2>
+                    <p>
+                        Your order has been submitted successfully.
+                        We will contact you to confirm the order and
+                        arrange collection.
+                    </p>
+                </div>
             </div>
 
-            {% endfor %}
-
-
-            <h3>
-                Total:
-                £{{ "%.2f"|format(order.total) }}
-            </h3>
-
-
-            <!-- Collection -->
-
-            <h3 style="margin-top: 30px;">
-                Collection
-            </h3>
-
-            <p>
-                <strong>Date:</strong>
-                {{ order.event.event_date.strftime("%A %d %B %Y") }}
-            </p>
-
-            <p>
-                <strong>Collection time:</strong>
-                {{ order.collection_slot.start_time.strftime("%H:%M") }}
-                -
-                {{ order.collection_slot.end_time.strftime("%H:%M") }}
-            </p>
-
-            <p>
-                This is a collection-only order.
-            </p>
-
-            <p>
-                <strong>
-                    The collection address will be provided to you
-                    directly after your order has been confirmed.
-                </strong>
-            </p>
-
-
-            <!-- Payment -->
-
-            <h3 style="margin-top: 30px;">
-                Payment
-            </h3>
-
-            <p>
-                Payment has not been taken through the website.
-            </p>
-
-            <p>
-                We will contact you using the phone number you
-                provided to confirm your order and ask whether
-                you would like to pay by bank transfer or cash
-                when you collect your order.
-            </p>
-
-            <p>
-                If you choose bank transfer, we will provide the
-                payment details to you directly.
-            </p>
-
-
-            <!-- Customer details -->
-
-            <h3 style="margin-top: 30px;">
-                Your Details
-            </h3>
-
-            <p>
-                <strong>Name:</strong>
-                {{ order.customer.name }}
-            </p>
-
-            <p>
-                <strong>Phone:</strong>
-                {{ order.customer.phone }}
-            </p>
-
-
-            <!-- Important reminder -->
-
-            <h3 style="margin-top: 30px;">
-                Please Keep Your Order Number
-            </h3>
-
-            <p>
-                Your order number is:
+            <div class="confirmation-order-number">
+                <span>Order number</span>
                 <strong>#{{ order.id }}</strong>
-            </p>
+                <p>Please keep this number for reference.</p>
+            </div>
 
-            <p>
-                Please mention this number when contacting us
-                about your order.
-            </p>
+            <section class="confirmation-section">
+                <h2>Your order</h2>
+
+                <div class="confirmation-items">
+                    {% for item in order_items %}
+                    <div class="confirmation-item">
+                        <div>
+                            <p class="confirmation-item-name">
+                                {{ item.menu_item.name }}
+                            </p>
+                            <p class="confirmation-muted">
+                                Quantity: {{ item.quantity }}
+                            </p>
+                        </div>
+
+                        <strong>
+                            £{{ "%.2f"|format(
+                                item.price_at_order * item.quantity
+                            ) }}
+                        </strong>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="confirmation-total">
+                    <span>Total order value</span>
+                    <strong>£{{ "%.2f"|format(order.total) }}</strong>
+                </div>
+            </section>
+
+            <section class="confirmation-section">
+                <h2>Collection arrangements</h2>
+
+                <div class="confirmation-info">
+                    <div class="confirmation-info-row">
+                        <span class="confirmation-info-label">Date</span>
+                        <strong>
+                            {{ order.event.event_date.strftime("%A %d %B %Y") }}
+                        </strong>
+                    </div>
+
+                    <div class="confirmation-info-row">
+                        <span class="confirmation-info-label">Time</span>
+                        <strong>
+                            {{ order.collection_slot.start_time.strftime("%H:%M") }}
+                            -
+                            {{ order.collection_slot.end_time.strftime("%H:%M") }}
+                        </strong>
+                    </div>
+                </div>
+
+                <p class="confirmation-note">
+                    <strong>Collection only.</strong>
+                    We do not offer delivery.
+                </p>
+
+                <p>
+                    For your privacy, the collection address will be
+                    provided directly after we have confirmed your order.
+                </p>
+            </section>
+
+            <section class="confirmation-section">
+                <h2>Payment</h2>
+
+                <p>
+                    No payment has been taken through this website.
+                </p>
+
+                <p>
+                    We will contact you using the phone number you
+                    provided to confirm your order and ask whether
+                    you prefer bank transfer or cash on collection.
+                </p>
+
+                <p>
+                    If you choose bank transfer, we will provide the
+                    payment details directly.
+                </p>
+            </section>
+
+            <section class="confirmation-section">
+                <h2>Your details</h2>
+
+                <div class="confirmation-info">
+                    <div class="confirmation-info-row">
+                        <span class="confirmation-info-label">Name</span>
+                        <strong>{{ order.customer.name }}</strong>
+                    </div>
+
+                    <div class="confirmation-info-row">
+                        <span class="confirmation-info-label">Phone</span>
+                        <strong>{{ order.customer.phone }}</strong>
+                    </div>
+                </div>
+            </section>
+
+            <a class="confirmation-back-link"
+               href="{{ url_for('home') }}">
+                Back to menu
+            </a>
 
         </section>
 
-
-        <div style="margin-top: 20px;">
-
-            <a href="{{ url_for('home') }}">
-                <button type="button">
-                    Back to Menu
-                </button>
-            </a>
-
-        </div>
-
     </main>
 
-
     <footer>
-
         <p>
-            <a href="{{ url_for('privacy') }}">
-                Privacy Notice
-            </a>
+            <a href="{{ url_for('privacy') }}">Privacy Notice</a>
             |
-            <a href="{{ url_for('terms') }}">
-                Terms & Conditions
-            </a>
+            <a href="{{ url_for('terms') }}">Terms &amp; Conditions</a>
             |
-            <a href="{{ url_for('allergens') }}">
-                Allergen Information
-            </a>
+            <a href="{{ url_for('allergens') }}">Allergen Information</a>
             |
-            <a href="{{ url_for('contact') }}">
-                Contact
-            </a>
+            <a href="{{ url_for('contact') }}">Contact</a>
         </p>
-
     </footer>
 
 </body>
-
 </html>

@@ -292,25 +292,6 @@ def checkout():
 
 
     if request.method == "POST":
-        
-        # ---------------------------------
-        # Validate fulfilment method
-        # ---------------------------------
-
-        fulfilment_method = request.form.get(
-            "fulfilment_method",
-            ""
-        ).strip()
-
-        if fulfilment_method != "Collection":
-
-            return render_template(
-                "checkout.html",
-                basket_items=basket_items,
-                total=total,
-                collection_slots=collection_slots,
-                error="Please choose a fulfilment method."
-            )
 
         # ---------------------------------
         # Validate basket quantities
@@ -671,43 +652,31 @@ def admin_logout():
     )
 
 # Admin: Dashboard
+
 @app.route("/admin")
 def admin():
 
     if not session.get("admin_logged_in"):
-        return redirect(
-            url_for("admin_login")
-        )
+        return redirect(url_for("admin_login"))
 
-
-    # ---------------------------------
     # Current active event
-    # ---------------------------------
+    event = (
+        FoodEvent.query
+        .filter_by(active=True)
+        .order_by(FoodEvent.event_date.asc())
+        .first()
+    )
 
-    event = FoodEvent.query.filter_by(
-        active=True
-    ).order_by(
-        FoodEvent.event_date.asc()
-    ).first()
-
-
-    # ---------------------------------
     # Previous events
-    # ---------------------------------
+    previous_events = (
+        FoodEvent.query
+        .filter(FoodEvent.active == False)
+        .order_by(FoodEvent.event_date.desc())
+        .all()
+    )
 
-    previous_events = FoodEvent.query.filter(
-        FoodEvent.active == False
-    ).order_by(
-        FoodEvent.event_date.desc()
-    ).all()
-
-
-    # ---------------------------------
-    # No active event
-    # ---------------------------------
-
+    # Default values when there is no active event
     if not event:
-
         return render_template(
             "admin.html",
             event=None,
@@ -715,91 +684,86 @@ def admin():
             previous_events=previous_events,
             food_totals={},
             total_revenue=0,
+            expected_revenue=0,
+            paid_revenue=0,
+            outstanding_payments=0,
+            cancelled_orders=0,
             new_orders=0,
             preparing_orders=0,
             ready_orders=0,
             collected_orders=0
         )
 
+    # Orders for the current active event only
+    orders = (
+        Order.query
+        .filter_by(event_id=event.id)
+        .order_by(Order.id.desc())
+        .all()
+    )
 
-    # ---------------------------------
-    # Current event orders
-    # ---------------------------------
+    # Revenue figures
+    expected_revenue = 0
+    paid_revenue = 0
+    outstanding_payments = 0
+    cancelled_orders = 0
 
-    orders = Order.query.filter_by(
-        event_id=event.id
-    ).order_by(
-        Order.id.desc()
-    ).all()
-
-
-    food_totals = {}
-
-    total_revenue = 0
-
-
+    # Order status counts
     new_orders = 0
     preparing_orders = 0
     ready_orders = 0
     collected_orders = 0
 
-
-    # ---------------------------------
-    # Process current event orders
-    # ---------------------------------
+    # Food preparation totals
+    food_totals = {}
 
     for order in orders:
 
-        # Revenue
-        if order.status != "Cancelled":
+        # Cancelled orders are counted separately and
+        # excluded from revenue and food preparation totals.
+        if order.status == "Cancelled":
+            cancelled_orders += 1
+            continue
 
-            total_revenue += order.total
+        # Expected revenue includes all non-cancelled orders.
+        expected_revenue += order.total
 
+        # Separate paid and unpaid amounts.
+        if order.payment_status == "Paid":
+            paid_revenue += order.total
+        else:
+            outstanding_payments += order.total
 
         # Order status counts
         if order.status == "New":
-
             new_orders += 1
-
         elif order.status == "Preparing":
-
             preparing_orders += 1
-
         elif order.status == "Ready":
-
             ready_orders += 1
-
         elif order.status == "Collected":
-
             collected_orders += 1
 
-
         # Food preparation totals
-        if order.status != "Cancelled":
+        order_items = OrderItem.query.filter_by(
+            order_id=order.id
+        ).all()
 
-            order_items = OrderItem.query.filter_by(
-                order_id=order.id
-            ).all()
+        for order_item in order_items:
+            item = db.session.get(
+                MenuItem,
+                order_item.menu_item_id
+            )
 
-
-            for order_item in order_items:
-
-                item = MenuItem.query.get(
-                    order_item.menu_item_id
+            if item:
+                food_totals[item.name] = (
+                    food_totals.get(item.name, 0)
+                    + order_item.quantity
                 )
 
-
-                if item:
-
-                    if item.name not in food_totals:
-
-                        food_totals[item.name] = 0
-
-
-                    food_totals[item.name] += (
-                        order_item.quantity
-                    )
-
+    # Keep the existing variable for compatibility
+    # with the current admin template.
+    total_revenue = expected_revenue
 
     return render_template(
         "admin.html",
@@ -808,6 +772,10 @@ def admin():
         previous_events=previous_events,
         food_totals=food_totals,
         total_revenue=total_revenue,
+        expected_revenue=expected_revenue,
+        paid_revenue=paid_revenue,
+        outstanding_payments=outstanding_payments,
+        cancelled_orders=cancelled_orders,
         new_orders=new_orders,
         preparing_orders=preparing_orders,
         ready_orders=ready_orders,

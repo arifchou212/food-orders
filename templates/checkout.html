@@ -73,11 +73,13 @@
 
 
     {% if error %}
-
-        <p role="alert">
-            {{ error }}
-        </p>
-
+        <div class="form-error" role="alert">
+            <span class="form-error-icon" aria-hidden="true">!</span>
+            <div>
+                <strong>Please check your order</strong>
+                <p>{{ error }}</p>
+            </div>
+        </div>
     {% endif %}
 
 

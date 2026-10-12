@@ -32,12 +32,14 @@
     <main>
 
         {% if error %}
-
-            <p>
-                {{ error }}
-            </p>
-
-        {% endif %}
+        <div class="form-error" role="alert">
+            <span class="form-error-icon" aria-hidden="true">!</span>
+            <div>
+                <strong>Login failed</strong>
+                <p>{{ error }}</p>
+            </div>
+        </div>
+    {% endif %}
 
 
         <form method="POST">
