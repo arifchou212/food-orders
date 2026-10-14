@@ -29,16 +29,22 @@ from models import (
     CollectionSlot
 )
 
+from flask_migrate import Migrate
+
 app = Flask(__name__)
 
 load_dotenv()
 
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-    "DATABASE_URL",
-    "sqlite:///food_orders.db"
-)
+db_url = os.getenv("DATABASE_URL", "sqlite:///food_orders.db")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+psycopg://", 1)
+elif db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle": 300}
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -46,8 +52,10 @@ csrf = CSRFProtect(app)
 
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()
+migrate = Migrate(app, db)
+
+# with app.app_context():
+#     db.create_all()
 
 @app.route("/")
 def home():
@@ -1848,5 +1856,5 @@ def toggle_food_event(event_id):
 if __name__ == "__main__":
 
     app.run(
-        debug=True
+        debug=False
     )

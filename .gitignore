@@ -3,3 +3,6 @@ venv/
 __pycache__/
 *.pyc
 food_orders.db
+instance/
+.neon
+migrations/
